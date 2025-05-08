@@ -6,6 +6,7 @@ from core.views import custom_login
 
 urlpatterns = [
     path('', views.accueil, name='accueil'),
+    path('accueil/', views.accueil, name='accueil'),
     path('machines/', views.machines, name='machines'),
     path('pieces/', views.pieces, name='pieces'),
     path('capteurs/', views.capteurs, name='capteurs'),
@@ -23,7 +24,6 @@ urlpatterns = [
     path('machine/<int:machine_id>/details/', views.details_machine, name='details_machine'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('accueil/', views.accueil, name='accueil'),
     path('intervention/<int:intervention_id>/cloturer/', views.cloturer_intervention, name='cloturer_intervention'),
     path('calendrier/', views.calendrier, name='calendrier'),
     path('intervention/<int:intervention_id>/modifier/', views.modifier_intervention, name='modifier_intervention'),
