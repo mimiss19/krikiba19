@@ -29,30 +29,74 @@ from django.contrib import messages
 
 
 
+
+
 def accueil(request):
+    # KPI globaux
+    total_plans = PlanMaintenance.objects.count()
+
+    total_time_min = PlanMaintenance.objects.aggregate(
+        total=Sum('temps_maintenance_minutes')
+    )['total'] or 0
+    total_time = f"{total_time_min // 60}h{total_time_min % 60}"
+
+    mttr_min = PlanMaintenance.objects.filter(
+        labels__icontains='correctif'
+    ).aggregate(avg=Avg('temps_arret_minutes'))['avg'] or 0
+    mttr = round(mttr_min / 60, 2)
+
+    mtbf = round((total_time_min / total_plans) if total_plans else 0, 2)
+    dispo = round((mtbf / (mtbf + mttr) * 100) if (mtbf + mttr) else 0, 1)
+
+    # Donut état équipements
+    eq_en_fct = Machine.objects.filter(
+        planmaintenance__isnull=False
+    ).distinct().count()
+    eq_autres = Machine.objects.count() - eq_en_fct
+    status_labels = ['En fonctionnement', 'Autres']
+    status_data   = [eq_en_fct, eq_autres]
+
+    # Bar chart type maintenance
+    count_prev = PlanMaintenance.objects.filter(
+        labels__icontains='preventif'
+    ).count()
+    count_corr = PlanMaintenance.objects.filter(
+        labels__icontains='correctif'
+    ).count()
+    type_labels = ['Préventive', 'Corrective']
+    type_data   = [count_prev, count_corr]
+
+    # Prochains plans
     today = date.today()
-    dans_3_jours = today + timedelta(days=3)
+    upcoming_plans = PlanMaintenance.objects.filter(
+        date_debut__gte=today
+    ).order_by('date_debut')[:10]
 
-    prochaines_interventions = Intervention.objects.filter(
-        date_planifiee__range=(today, dans_3_jours)
-    )
+    # Cartes équipements
+    machines = Machine.objects.all()
 
-    interventions = Intervention.objects.all()
-    total_minutes = sum(i.duree_total for i in interventions if i.duree_total)
-    total_heures = total_minutes // 60
-    minutes_restant = total_minutes % 60
+    # Performance : nombre de plans créés chaque jour sur les 7 derniers jours
+    days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    perf_labels = [d.strftime('%d %b') for d in days]
+    perf_data = [
+        PlanMaintenance.objects.filter(date_debut=d).count()
+        for d in days
+    ]
 
-    mttr = round(total_minutes / len(interventions)) if interventions else 0
-    mttr_heures = mttr // 60
-    mttr_minutes = mttr % 60
-
-    return render(request, 'accueil.html', {
-        'prochaines_interventions': prochaines_interventions,
-        'total_interventions': interventions.count(),
-        'total_heures': total_heures,
-        'total_minutes': minutes_restant,
-        'mttr_heures': mttr_heures,
-        'mttr_minutes': mttr_minutes
+    return render(request, 'plans/accueil.html', {
+        'total_plans': total_plans,
+        'total_time': total_time,
+        'mttr': mttr,
+        'mtbf': mtbf,
+        'dispo': dispo,
+        'status_labels': status_labels,
+        'status_data': status_data,
+        'type_labels': type_labels,
+        'type_data': type_data,
+        'upcoming_plans': upcoming_plans,
+        'machines': machines,
+        'perf_labels': perf_labels,
+        'perf_data': perf_data,
     })
 
 def machines(request):
