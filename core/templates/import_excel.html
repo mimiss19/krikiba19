@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .upload-area {
+    border: 2px dashed #8e0057;
+    border-radius: 16px;
+    padding: 50px;
+    text-align: center;
+    transition: 0.3s ease;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .upload-area:hover {
+    background-color: #f8eef3;
+  }
+
+  .upload-area.dragover {
+    background-color: #ffebf5;
+    border-color: #72003c;
+  }
+
+  .upload-area .icon {
+    font-size: 4rem;
+    color: #8e0057;
+    margin-bottom: 10px;
+  }
+
+  .upload-area .title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .upload-area input[type="file"] {
+    display: none;
+  }
+
+  .btn-import {
+    background-color: #8e0057;
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 20px;
+    font-weight: bold;
+    transition: 0.3s ease;
+  }
+
+  .btn-import:hover {
+    background-color: #6c0045;
+    transform: scale(1.05);
+  }
+
+  .preview {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #444;
+  }
+
+  .alert {
+    margin: 15px 0;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  .alert-success {
+    background-color: #e6ffee;
+    color: #006644;
+    border: 1px solid #00cc88;
+  }
+
+  .alert-error {
+    background-color: #ffe6e6;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+  }
+</style>
+
+<div style="max-width: 600px; margin: 50px auto;">
+  {% if message %}
+    <div class="alert {% if success %}alert-success{% else %}alert-error{% endif %}">
+      {{ message }}
+    </div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data" id="uploadForm">
+    {% csrf_token %}
+    <label for="file" class="upload-area" id="dropZone">
+      <div class="icon">☁️</div>
+      <div class="title">Glissez un fichier Excel ici ou cliquez</div>
+      <input type="file" id="file" name="file" accept=".xlsx,.xls">
+      <div class="preview" id="fileName">Aucun fichier sélectionné</div>
+    </label>
+
+    <button class="btn-import" type="submit">🚀 Importer</button>
+  </form>
+</div>
+
+<script>
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('file');
+  const preview = document.getElementById('fileName');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      fileInput.files = e.dataTransfer.files;
+      preview.innerText = e.dataTransfer.files[0].name;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      preview.innerText = fileInput.files[0].name;
+    }
+  });
+</script>
+
+{% endblock %}

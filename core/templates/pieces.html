@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="table-container">
+  <h2>📦 Pièces de rechange</h2>
+  {% if messages %}
+  <div class="alert alert-success" style="margin-bottom: 20px;">
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+  </div>
+{% endif %}
+  <!-- Supprimer toutes les pièces -->
+  <form method="post" action="{% url 'delete_all_pieces' %}">
+    {% csrf_token %}
+    <label for="machines">Machines compatibles :</label>
+    <select name="machines_compatibles" multiple class="form-control">
+      {% for machine in all_machines %}
+        <option value="{{ machine.id }}"
+          {% if machine in machines_compatibles %}
+             selected
+          {% endif %}
+        >{{ machine.nom }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-danger" type="submit">
+      <i class="fa fa-trash"></i> Supprimer toutes les pièces
+    </button>
+  </form>
+
+  <!-- Tableau -->
+  <table class="display">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Désignation</th>
+        <th>Quantité</th>
+        <th>Seuil alerte</th>
+        <th>Prix (dhs)</th>
+        <th>Machines compatibles</th>
+        <th>Alerte</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for piece in pieces %}
+      <tr>
+        <td>{{ piece.code }}</td>
+        <td>{{ piece.designation }}</td>
+        <td>{{ piece.quantite_stock }}</td>
+        <td>{{ piece.seuil_alerte }}</td>
+        <td>{{ piece.prix_unitaire }}</td>
+        <td>
+          {% for m in piece.machines.all %}
+            {{ m.nom }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% if piece.quantite_stock <= piece.seuil_alerte %}
+            ⚠️ Alerte
+          {% else %}
+            ✅ OK
+          {% endif %}
+        </td>
+        <td>
+          <!-- Bouton Éditer -->
+          <button type="button" class="btn btn-edit edit-btn"
+            data-id="{{ piece.id }}"
+            data-code="{{ piece.code }}"
+            data-designation="{{ piece.designation }}"
+            data-quantite="{{ piece.quantite_stock }}"
+            data-seuil="{{ piece.seuil_alerte }}"
+            data-prix="{{ piece.prix_unitaire }}">
+            <i class="fa fa-pen"></i>
+          </button>
+
+          <!-- Formulaire suppression -->
+          <form method="post" action="{% url 'delete_piece' piece.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button class="btn btn-delete" type="submit" title="Supprimer">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal de modification -->
+<div class="modal fade" id="editPieceModal" tabindex="-1" aria-labelledby="editPieceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'modifier_piece' %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modifier la pièce</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="piece_id" id="editPieceId">
+          <div class="mb-3">
+            <label>Code</label>
+            <input type="text" name="code" class="form-control" id="editCode" required>
+          </div>
+          <div class="mb-3">
+            <label>Désignation</label>
+            <input type="text" name="designation" class="form-control" id="editDesignation" required>
+          </div>
+          <div class="mb-3">
+            <label>Quantité</label>
+            <input type="number" name="quantite" class="form-control" id="editQuantite" required>
+          </div>
+          <div class="mb-3">
+            <label>Seuil alerte</label>
+            <input type="number" name="seuil" class="form-control" id="editSeuil" required>
+          </div>
+          <div class="mb-3">
+            <label>Prix unitaire (dhs)</label>
+            <input type="number" step="0.01" name="prix" class="form-control" id="editPrix" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Enregistrer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JS pour le bouton éditer -->
+<script>
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('editPieceId').value = btn.dataset.id;
+      document.getElementById('editCode').value = btn.dataset.code;
+      document.getElementById('editDesignation').value = btn.dataset.designation;
+      document.getElementById('editQuantite').value = btn.dataset.quantite;
+      document.getElementById('editSeuil').value = btn.dataset.seuil;
+      document.getElementById('editPrix').value = btn.dataset.prix;
+
+      new bootstrap.Modal(document.getElementById('editPieceModal')).show();
+    });
+  });
+</script>
+<script>
+  // Fermeture du modal après soumission réussie
+  document.getElementById('editPieceForm').addEventListener('submit', function (e) {
+    setTimeout(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editPieceModal'));
+      if (modal) modal.hide();
+    }, 500); // attend un peu pour laisser le temps de redirection
+  });
+</script>
+{% endblock %}
+
+

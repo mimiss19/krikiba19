@@ -1,0 +1,1823 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<style>
+  body {
+    background: linear-gradient(to right, #e6ecf0, #f4f6f9);
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+  .container-full {
+    max-width: 960px;
+    margin: auto;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .styled-title {
+    font-size: 2.3rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #9b59b6, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .progress-bar-container {
+    width: 100%;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 20%;
+    transition: width 0.4s ease;
+    background: linear-gradient(to right, #6c5ce7, #a29bfe);
+  }
+  .step-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #bbb;
+    font-weight: 500;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .step-header div.active {
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  .card-step {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    padding: 2rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .card-step.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .form-label {
+    font-weight: 600;
+    color: #444;
+  }
+  .btn-custom {
+    border-radius: 12px;
+    font-size: 1rem;
+    padding: 10px 28px;
+    font-weight: 500;
+  }
+  .select2-container--default .select2-selection--multiple {
+    border-radius: 10px;
+    min-height: 44px;
+  }
+  .select2-selection__choice {
+    background-color: #6c5ce7 !important;
+    border: none !important;
+    color: white !important;
+    padding: 4px 10px;
+    border-radius: 16px;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+  .step-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  #calendarPreview {
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: white;
+    height: 400px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #calendarPreview .flatpickr-calendar {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    flex: 1;
+    max-width: none !important;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    background: transparent;
+  }
+  
+  #calendarPreview .flatpickr-month,
+  #calendarPreview .flatpickr-innerContainer {
+    width: 100% !important;
+  }
+  
+  #calendarPreview .flatpickr-days {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  
+  #calendarPreview .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+  }
+  
+  #calendarPreview .flatpickr-day {
+    max-width: none !important;
+    width: 14.28% !important;
+    margin: 0;
+    height: 38px;
+    line-height: 38px;
+  }
+  
+  #calendarPreview .flatpickr-months {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  
+  #calendarPreview .flatpickr-calendar.inline {
+    top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  .occurrence-date {
+    padding: 6px 12px;
+    background: #f0f4ff;
+    border-left: 3px solid #6c5ce7;
+    border-radius: 4px;
+    margin-right: 5px;
+    margin-bottom: 8px;
+    display: inline-block;
+    font-size: 0.85rem;
+  }
+  
+  .occurrence-container {
+    max-height: 160px;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding: 5px;
+  }
+  
+  .card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  
+  .card-option {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  
+  .card-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  }
+  
+  .card-option.active {
+    border-left: 3px solid #6c5ce7;
+    background-color: #f8f9ff;
+  }
+  
+  .repeating-pattern {
+    padding: 10px 15px;
+    background: #f8f9ff;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #6c5ce7;
+  }
+  
+  .maintenance-indicator {
+    height: 8px;
+    background: #6c5ce7;
+    border-radius: 4px;
+    margin-top: 5px;
+  }
+  
+  .info-tooltip {
+    cursor: pointer;
+    color: #6c5ce7;
+  }
+  
+  .badge-primary {
+    background-color: #6c5ce7;
+    color: white;
+  }
+  
+  .form-switch .form-check-input:checked {
+    background-color: #6c5ce7;
+    border-color: #6c5ce7;
+  }
+  
+  .input-group-text {
+    background-color: #f0f4ff;
+    border-color: #dee2e6;
+    color: #555;
+  }
+  
+  #day-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .day-button {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .day-button.active {
+    background: #6c5ce7;
+    color: white;
+    border-color: #6c5ce7;
+  }
+  
+  .task-tag {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-right: 5px;
+    background: #f0f4ff;
+    color: #6c5ce7;
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+  
+  .scheduled-date {
+    position: relative;
+  }
+  
+  .scheduled-date::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6c5ce7;
+  }
+  
+  /* Correction pour l'alignement des champs d'estimation */
+  .estimations-temps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .estimations-temps-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 10px;
+  }
+  
+  .estimation-field {
+    flex: 1 1 30%;
+    min-width: 140px;
+  }
+  
+  .estimation-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+  }
+  .form-label {
+  white-space: normal;
+  font-size: 1rem;
+}
+
+.card .form-control {
+  font-size: 1.1rem;
+}
+
+
+</style>
+
+<div class="container-full">
+  <h2 class="styled-title"><i class="bi bi-tools"></i>Créer un Plan de Maintenance</h2>
+  <div class="progress-bar-container">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <div class="step-header">
+    <div id="title-1" class="active">1. Infos</div>
+    <div id="title-2">2. Planification</div>
+    <div id="title-3">3. Techniciens</div>
+    <div id="title-4">4. Checklist</div>
+    <div id="title-5">5. Validation</div>
+  </div>
+  <form method="post" action="{% url 'creer_plan' %}" class="w-100">
+    {% csrf_token %}
+    <!-- Étape 1 -->
+    <div class="card-step active" id="step-1">
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-type"></i> Titre du plan</label>
+        <input type="text" name="titre" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-tags"></i> Sélectionner votre équipement</label>
+        <select name="machine" class="form-control select2" multiple>
+          {% for machine in machines %}
+            <option value="{{ machine.id }}">{{ machine.nom }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-card-text"></i> Description</label>
+        <textarea name="description" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label"><i class="bi bi-tags"></i> Type de maintenance</label>
+          <select name="type_maintenance" class="form-select">
+            <option value="preventif">Préventive</option>
+            <option value="correctif">Corrective</option>
+            <option value="conditionnelle">Conditionnelle</option>
+            <option value="predictive">Prédictive</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label"><i class="bi bi-bookmark"></i> Priorité</label>
+          <select name="priorite" class="form-select">
+            <option value="basse">Basse</option>
+            <option value="normale" selected>Normale</option>
+            <option value="haute">Haute</option>
+            <option value="urgente">Urgente</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-tags"></i> Labels</label>
+        <select name="labels" class="form-control select2" multiple>
+          <option>Préventif</option>
+          <option>Correctif</option>
+          <option>Réglementaire</option>
+          <option>Sécurité</option>
+          <option>Production</option>
+          <option>Qualité</option>
+          <option>Environnement</option>
+        </select>
+      </div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="reglementaire" name="reglementaire">
+        <label class="form-check-label" for="reglementaire">
+          <i class="bi bi-shield-lock"></i> Ce plan est réglementaire
+        </label>
+      </div>
+      <div class="step-buttons">
+        <div></div>
+        <button type="button" class="btn btn-primary btn-custom" onclick="changeStep(2)">Suivant</button>
+      </div>
+    </div>
+
+    <!-- Étape 2 - Planification avancée -->
+    <div class="card-step" id="step-2">
+      <h4 class="mb-4"><i class="bi bi-calendar-check"></i> Planification</h4>
+
+      <!-- Périodicité et Récurrence -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label"><i class="bi bi-arrow-repeat"></i> Périodicité</label>
+          <select name="periodicite" id="periodicite" class="form-select" required>
+            <option value="ponctuelle">Ponctuelle (une seule fois)</option>
+            <option value="quotidienne">Quotidienne</option>
+            <option value="hebdomadaire">Hebdomadaire</option>
+            <option value="mensuelle" selected>Mensuelle</option>
+            <option value="trimestrielle">Trimestrielle</option>
+            <option value="semestrielle">Semestrielle</option>
+            <option value="annuelle">Annuelle</option>
+            <option value="personnalisee">Personnalisée (en jours)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label"><i class="bi bi-repeat"></i> Fréquence</label>
+          <div class="input-group">
+            <span class="input-group-text">Tous les</span>
+            <input type="number" name="frequence" id="frequence" min="1" value="1" class="form-control" required>
+            <span class="input-group-text" id="unite-frequence">mois</span>
+          </div>
+          <small class="text-muted" id="frequenceHelp">Le plan s'exécutera tous les mois</small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Date de début et fin -->
+          <div class="mb-3">
+            <label for="dateDebut" class="form-label"><i class="bi bi-calendar-plus"></i> Date de début</label>
+            <input type="text" id="dateDebut" name="date_debut" class="form-control" placeholder="Sélectionner la date de début">
+          </div>
+          <div class="mb-3">
+            <label for="dateFin" class="form-label"><i class="bi bi-calendar-minus"></i> Date de fin (optionnelle)
+              <i class="bi bi-info-circle-fill info-tooltip" data-bs-toggle="tooltip" title="Laissez vide pour un plan sans date de fin"></i>
+            </label>
+            <input type="text" id="dateFin" name="date_fin" class="form-control" placeholder="Sélectionner la date de fin">
+          </div>
+
+          <!-- Conteneur dynamique pour les options de récurrence -->
+          <div id="recurrence-options" class="mb-3">
+            <!-- Options pour périodicité ponctuelle -->
+            <div id="options-ponctuelle" class="periodicite-options d-none">
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill"></i> Cette maintenance sera effectuée une seule fois.
+              </div>
+            </div>
+
+            <!-- Options pour périodicité quotidienne -->
+            <div id="options-quotidienne" class="periodicite-options mb-3 d-none">
+              <div class="card p-3">
+                <h6 class="mb-3"><i class="bi bi-calendar-day"></i> Options quotidiennes</h6>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="option_quotidien" id="tous_jours" value="tous" checked>
+                  <label class="form-check-label" for="tous_jours">Tous les jours</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="option_quotidien" id="jours_ouvrables" value="ouvrables">
+                  <label class="form-check-label" for="jours_ouvrables">Jours ouvrables uniquement (Lun-Ven)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="option_quotidien" id="jours_personnalises" value="personnalises">
+                  <label class="form-check-label" for="jours_personnalises">Jours personnalisés</label>
+                </div>
+                <div id="jour-personnalises-selection" class="mt-3 d-none">
+                  <label class="form-label">Sélectionnez les jours:</label>
+                  <div id="day-buttons">
+                    <div class="day-button" data-day="1">L</div>
+                    <div class="day-button" data-day="2">M</div>
+                    <div class="day-button" data-day="3">M</div>
+                    <div class="day-button" data-day="4">J</div>
+                    <div class="day-button" data-day="5">V</div>
+                    <div class="day-button" data-day="6">S</div>
+                    <div class="day-button" data-day="0">D</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Options pour périodicité hebdomadaire -->
+            <div id="options-hebdomadaire" class="periodicite-options mb-3 d-none">
+              <div class="card p-3">
+                <h6 class="mb-3"><i class="bi bi-calendar-week"></i> Jours de la semaine</h6>
+                <div class="d-flex flex-wrap">
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="lundi" value="lundi">
+                    <label class="form-check-label" for="lundi">Lun</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="mardi" value="mardi">
+                    <label class="form-check-label" for="mardi">Mar</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="mercredi" value="mercredi">
+                    <label class="form-check-label" for="mercredi">Mer</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="jeudi" value="jeudi">
+                    <label class="form-check-label" for="jeudi">Jeu</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="vendredi" value="vendredi">
+                    <label class="form-check-label" for="vendredi">Ven</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="samedi" value="samedi">
+                    <label class="form-check-label" for="samedi">Sam</label>
+                  </div>
+                  <div class="form-check me-3 mb-2">
+                    <input class="form-check-input jour-semaine-check" type="checkbox" name="jour_semaine[]" id="dimanche" value="dimanche">
+                    <label class="form-check-label" for="dimanche">Dim</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Options pour périodicité mensuelle -->
+            <div id="options-mensuelle" class="periodicite-options mb-3">
+              <div class="card p-3">
+                <h6 class="mb-3"><i class="bi bi-calendar-month"></i> Options mensuelles</h6>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="type_recurrence" id="jour_fixe_mois" value="jour_du_mois" checked>
+                  <label class="form-check-label" for="jour_fixe_mois">Le même jour chaque mois</label>
+                </div>
+                <div class="mb-3" id="jourMoisSection">
+                  <div class="input-group">
+                    <span class="input-group-text">Le</span>
+                    <input type="number" name="jour_mois" id="jourMois" min="1" max="31" value="1" class="form-control">
+                    <span class="input-group-text">du mois</span>
+                  </div>
+                </div>
+                
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="type_recurrence" id="jour_semaine_mois" value="jour_semaine">
+                  <label class="form-check-label" for="jour_semaine_mois">Le même jour de semaine chaque mois</label>
+                </div>
+                <div class="row mb-3 d-none" id="jourSemaineSection">
+                  <div class="col-6">
+                    <select name="rang_semaine" id="rangSemaine" class="form-select">
+                      <option value="1">Premier</option>
+                      <option value="2">Deuxième</option>
+                      <option value="3">Troisième</option>
+                      <option value="4">Quatrième</option>
+                      <option value="last">Dernier</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <select name="jour_semaine_mensuel" id="jourSemaineMensuel" class="form-select">
+                      <option value="lundi">Lundi</option>
+                      <option value="mardi">Mardi</option>
+                      <option value="mercredi">Mercredi</option>
+                      <option value="jeudi">Jeudi</option>
+                      <option value="vendredi">Vendredi</option>
+                      <option value="samedi">Samedi</option>
+                      <option value="dimanche">Dimanche</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Options pour périodicité trimestrielle/semestrielle - combinent les options mensuelles avec fréquence personnalisée -->
+
+            <!-- Options pour périodicité annuelle -->
+            <div id="options-annuelle" class="periodicite-options mb-3 d-none">
+              <div class="card p-3">
+                <h6 class="mb-3"><i class="bi bi-calendar"></i> Options annuelles</h6>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="option_annuel" id="jour_mois_fixe" value="date_fixe" checked>
+                  <label class="form-check-label" for="jour_mois_fixe">À une date fixe</label>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <select id="moisAnnuel" name="mois_annuel" class="form-select">
+                      <option value="1">Janvier</option>
+                      <option value="2">Février</option>
+                      <option value="3">Mars</option>
+                      <option value="4">Avril</option>
+                      <option value="5">Mai</option>
+                      <option value="6">Juin</option>
+                      <option value="7">Juillet</option>
+                      <option value="8">Août</option>
+                      <option value="9">Septembre</option>
+                      <option value="10">Octobre</option>
+                      <option value="11">Novembre</option>
+                      <option value="12">Décembre</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <input type="number" name="jour_mois_annuel" id="jourMoisAnnuel" min="1" max="31" value="1" class="form-control" placeholder="Jour">
+                  </div>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="option_annuel" id="jour_semaine_annuel" value="jour_semaine">
+                  <label class="form-check-label" for="jour_semaine_annuel">Un jour de semaine spécifique</label>
+                </div>
+                <div class="row mb-3 d-none" id="jourSemaineAnnuelSection">
+                  <div class="col-4">
+                    <select name="rang_semaine_annuel" id="rangSemaineAnnuel" class="form-select">
+                      <option value="1">Premier</option>
+                      <option value="2">Deuxième</option>
+                      <option value="3">Troisième</option>
+                      <option value="4">Quatrième</option>
+                      <option value="last">Dernier</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <select name="jour_semaine_annuel" id="jourSemaineAnnuel" class="form-select">
+                      <option value="lundi">Lundi</option>
+                      <option value="mardi">Mardi</option>
+                      <option value="mercredi">Mercredi</option>
+                      <option value="jeudi">Jeudi</option>
+                      <option value="vendredi">Vendredi</option>
+                      <option value="samedi">Samedi</option>
+                      <option value="dimanche">Dimanche</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <select name="mois_annuel_jour" id="moisAnnuelJour" class="form-select">
+                      <option value="1">Janvier</option>
+                      <option value="2">Février</option>
+                      <option value="3">Mars</option>
+                      <option value="4">Avril</option>
+                      <option value="5">Mai</option>
+                      <option value="6">Juin</option>
+                      <option value="7">Juillet</option>
+                      <option value="8">Août</option>
+                      <option value="9">Septembre</option>
+                      <option value="10">Octobre</option>
+                      <option value="11">Novembre</option>
+                      <option value="12">Décembre</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Options pour périodicité personnalisée -->
+            <div id="options-personnalisee" class="periodicite-options mb-3 d-none">
+              <div class="card p-3">
+                <h6 class="mb-3"><i class="bi bi-gear"></i> Intervalle personnalisé</h6>
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Tous les</span>
+                  <input type="number" name="jours_personnalises" id="joursPersonnalises" min="1" value="7" class="form-control">
+                  <span class="input-group-text">jours</span>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="exclure_weekends" name="exclure_weekends">
+                  <label class="form-check-label" for="exclure_weekends">
+                    Exclure les week-ends
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Option Toute la journée et horaires -->
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="touteJournee" name="touteJournee" checked>
+            <label class="form-check-label" for="touteJournee"><i class="bi bi-clock"></i> Toute la journée</label>
+          </div>
+          <!-- Horaires personnalisés -->
+          <div class="row mb-3 d-none" id="horaireSection">
+            <div class="col">
+              <label class="form-label"><i class="bi bi-clock-history"></i> Heure de début</label>
+              <input type="time" name="heure_debut" id="heureDebut" class="form-control" value="08:00">
+            </div>
+            <div class="col">
+              <label class="form-label"><i class="bi bi-clock-fill"></i> Heure de fin</label>
+              <input type="time" name="heure_fin" id="heureFin" class="form-control" value="12:00">
+            </div>
+          </div>
+
+          <!-- Options avancées de planification -->
+          <div class="mb-3">
+            <button type="button" id="toggleOptions" class="btn btn-link p-0 text-decoration-none d-block">
+              <i class="bi bi-chevron-down"></i> Options avancées
+            </button>
+            <div id="optionsAvancees" style="display: none;">
+              <div class="card p-3 mt-2">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="generate_auto" name="generate_auto" checked>
+                  <label class="form-check-label" for="generate_auto">
+                    Générer automatiquement les interventions
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="notification_email" name="notification_email" checked>
+                  <label class="form-check-label" for="notification_email">
+                    Notification par email
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="depasser_fin" name="depasser_fin">
+                  <label class="form-check-label" for="depasser_fin">
+                    Autoriser le dépassement de la date de fin pour terminer un cycle
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label"><i class="bi bi-calendar2-week"></i> Aperçu calendrier</label>
+          <div id="calendarPreview" style="display: none;"></div>
+          <div class="occurrence-preview mt-3">
+            <p><i class="bi bi-info-circle"></i> <strong>Prochaines occurrences:</strong></p>
+            <div id="occurrenceContainer" class="occurrence-container">
+              <!-- Les occurrences seront ajoutées ici dynamiquement -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-buttons">
+        <button type="button" class="btn btn-secondary btn-custom" onclick="changeStep(1)">Retour</button>
+        <button type="button" class="btn btn-primary btn-custom" onclick="changeStep(3)">Suivant</button>
+        
+      </div>
+    </div>
+
+    <!-- Étape 3 - Techniciens -->
+    <div class="card-step" id="step-3">
+      <h4 class="mb-4"><i class="bi bi-person-check"></i> Assignation du personnel</h4>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-person-fill"></i> Techniciens assignés</label>
+            <select class="form-control select2" name="techniciens" multiple>
+              {% for technicien in techniciens %}
+                <option value="{{ technicien.id }}">{{ technicien.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-people-fill"></i> Équipe responsable</label>
+            <select class="form-select" name="equipe_responsable">
+              <option value="">Aucune équipe assignée</option>
+              <option value="maintenance">Équipe maintenance</option>
+              <option value="production">Équipe production</option>
+              <option value="qualite">Équipe qualité</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-shield-check"></i> Compétences requises</label>
+            <select class="form-control select2" name="competences_requises" multiple>
+              <option value="mecanique">Mécanique</option>
+              <option value="electrique">Électrique</option>
+              <option value="electronique">Électronique</option>
+              <option value="hydraulique">Hydraulique</option>
+              <option value="pneumatique">Pneumatique</option>
+              <option value="automatisme">Automatisme</option>
+              <option value="informatique">Informatique</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-person-badge"></i> Superviseur</label>
+            <select class="form-select" name="superviseur">
+              <option value="">Aucun superviseur assigné</option>
+              {% for technicien in techniciens %}
+                {% if technicien.is_supervisor %}
+                  <option value="{{ technicien.id }}">{{ technicien.username }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 mb-4 w-100">
+        <h5 class="mb-4"><i class="bi bi-clock-history"></i> Estimations de temps</h5>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold">Temps de préparation (min)</label>
+          <input type="number" name="temps_preparation" class="form-control form-control-lg" value="15" min="0">
+        </div>
+      
+        <div class="mb-3">
+          <label class="form-label fw-bold">Temps d'exécution (min)</label>
+          <input type="number" name="temps_execution" class="form-control form-control-lg" value="60" min="1">
+        </div>
+      
+        <div class="mb-3">
+          <label class="form-label fw-bold">Temps de finalisation (min)</label>
+          <input type="number" name="temps_finalisation" class="form-control form-control-lg" value="15" min="0">
+        </div>
+      
+        <div class="mb-3">
+          <label class="form-label fw-bold"><i class="bi bi-people"></i> Nombre de techniciens requis</label>
+          <input type="number" name="nombre_techniciens" class="form-control form-control-lg" value="1" min="1">
+        </div>
+      
+        <div class="mb-3">
+          <label class="form-label fw-bold"><i class="bi bi-slash-circle"></i> Temps d'arrêt machine (min)</label>
+          <input type="number" name="temps_arret" class="form-control form-control-lg" placeholder="0 = pas d'arrêt" min="0">
+        </div>
+      </div>
+      
+
+      <div class="step-buttons">
+        <button type="button" class="btn btn-secondary btn-custom" onclick="changeStep(2)">Retour</button>
+        <button type="button" class="btn btn-primary btn-custom" onclick="changeStep(4)">Suivant</button>
+      </div>
+    </div>
+
+    <!-- Étape 4 - Checklist -->
+    <div class="card-step" id="step-4">
+      <h4 class="mb-4"><i class="bi bi-list-check"></i> Procédure et checklist</h4>
+      
+      <div class="mb-4">
+        <label class="form-label d-flex justify-content-between">
+          <span><i class="bi bi-list-check"></i> Checklist d'intervention</span>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="ajouterEtape">
+            <i class="bi bi-plus-circle"></i> Ajouter une étape
+          </button>
+        </label>
+        <div id="checklist-container">
+          <div class="card p-3 mb-3 checklist-item">
+            <div class="d-flex mb-2">
+              <span class="badge bg-primary me-2">1</span>
+              <input type="text" name="checklist_titre[]" class="form-control" placeholder="Titre de l'étape">
+              <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-step"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <textarea name="checklist_details[]" class="form-control" rows="2" placeholder="Description détaillée de l'étape..."></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card p-3">
+            <h5 class="mb-3"><i class="bi bi-tools"></i> Ressources nécessaires</h5>
+            <div class="mb-3">
+              <label class="form-label">Outils requis</label>
+              <select class="form-control select2" name="outils" multiple>
+                <option>Clé plate</option>
+                <option>Clé à molette</option>
+                <option>Tournevis</option>
+                <option>Multimètre</option>
+                <option>Marteau</option>
+                <option>Graisseur</option>
+                <option>Clé dynamométrique</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Pièces de rechange</label>
+              <select class="form-control select2" name="pieces" multiple>
+                <option>Filtre</option>
+                <option>Joint</option>
+                <option>Courroie</option>
+                <option>Roulement</option>
+                <option>Huile</option>
+                <option>Graisse</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Équipements de protection</label>
+              <select class="form-control select2" name="epi" multiple>
+                <option>Gants</option>
+                <option>Casque</option>
+                <option>Lunettes</option>
+                <option>Masque</option>
+                <option>Harnais</option>
+                <option>Chaussures de sécurité</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-3">
+            <h5 class="mb-3"><i class="bi bi-file-earmark-text"></i> Documentation</h5>
+            <div class="mb-3">
+              <label class="form-label">Instructions supplémentaires</label>
+              <textarea name="instructions" class="form-control" rows="4" placeholder="Notes ou instructions spéciales..."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Documents de référence</label>
+              <select class="form-control select2" name="documents" multiple>
+                <option>Manuel technique</option>
+                <option>Schéma électrique</option>
+                <option>Plan mécanique</option>
+                <option>Fiche de sécurité</option>
+                <option>Procédure qualité</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-buttons">
+        <button type="button" class="btn btn-secondary btn-custom" onclick="changeStep(3)">Retour</button>
+        <button type="button" class="btn btn-primary btn-custom" onclick="changeStep(5)">Suivant</button>
+      </div>
+    </div>
+
+    <!-- Étape 5 - Validation -->
+    <div class="card-step" id="step-5">
+      <h4 class="text-center mb-4"><i class="bi bi-check2-circle"></i> Résumé du plan de maintenance</h4>
+      
+      <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle-fill"></i> Veuillez vérifier les informations ci-dessous avant de finaliser le plan de maintenance.
+      </div>
+      
+      <div id="resume" class="p-4 border rounded bg-light">
+        <!-- Le résumé sera rempli dynamiquement -->
+      </div>
+      
+      <div class="card p-4 mt-4 mb-4">
+        <h5 class="mb-4"><i class="bi bi-gear-fill"></i> Options de finalisation</h5>
+      
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="activer_plan" name="activer_plan">
+          <label class="form-check-label fw-semibold" for="activer_plan">
+            Activer le plan immédiatement
+          </label>
+        </div>
+      
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="creer_premiere_intervention" name="creer_premiere_intervention" checked>
+          <label class="form-check-label fw-semibold" for="creer_premiere_intervention">
+            Créer la première intervention automatiquement
+          </label>
+        </div>
+      
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="notification_creation" name="notification_creation" checked>
+          <label class="form-check-label fw-semibold" for="notification_creation">
+            Notifier les techniciens assignés
+          </label>
+        </div>
+      
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="ajouter_favoris" name="ajouter_favoris">
+          <label class="form-check-label fw-semibold" for="ajouter_favoris">
+            Ajouter ce plan aux favoris
+          </label>
+        </div>
+      </div>
+      
+      <div class="step-buttons">
+        <button type="button" class="btn btn-secondary btn-custom" onclick="changeStep(4)">Retour</button>
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i>Créer le plan
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/locale/fr.js"></script>
+
+<script>
+$(document).ready(function() {
+  // Initialisation des tooltips Bootstrap
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+
+  // Initialisation de Select2
+  $('.select2').select2({
+    width: '100%',
+    placeholder: 'Sélectionnez...',
+    allowClear: true
+  });
+  
+  // Configuration de dayjs en français
+  dayjs.locale('fr');
+  
+  // Variable pour éviter les mises à jour circulaires
+  let isUpdatingFromDateInputs = false;
+  
+  // Configuration des datepickers
+  const today = new Date();
+  
+  // Calendrier d'aperçu avec mode range
+const calendarPicker = flatpickr("#calendarPreview", {
+  inline: true,
+  locale: "fr",
+  dateFormat: "Y-m-d",
+  disableMobile: true,
+  mode: "range",
+  defaultDate: [today, today],
+  firstDayOfWeek: 1,
+  static: true,
+  onReady: function() {
+    // Forcer le redimensionnement après un court délai
+    setTimeout(function() {
+      document.querySelector('#calendarPreview .flatpickr-calendar').style.position = 'static';
+      document.querySelector('#calendarPreview .flatpickr-calendar').style.top = '0';
+      document.querySelector('#calendarPreview .flatpickr-calendar').style.left = '0';
+      document.querySelector('#calendarPreview .flatpickr-calendar').style.width = '100%';
+      document.querySelector('#calendarPreview .flatpickr-calendar').style.height = 'auto';
+      
+      // Assurer que le conteneur des jours remplit tout l'espace
+      document.querySelector('#calendarPreview .flatpickr-innerContainer').style.width = '100%';
+      document.querySelector('#calendarPreview .flatpickr-days').style.width = '100%';
+      document.querySelector('#calendarPreview .dayContainer').style.width = '100%';
+      document.querySelector('#calendarPreview .flatpickr-days').style.minWidth = '100%';
+    }, 100);
+  }
+});
+
+  // Datepicker pour la date de début
+  const dateDebutPicker = flatpickr("#dateDebut", {
+    altInput: true,
+    altFormat: "j F Y",
+    dateFormat: "Y-m-d",
+    defaultDate: today,
+    locale: "fr",
+    disableMobile: true,
+    onChange: function(selectedDates, dateStr) {
+      // Mettre à jour la date min du dateFin
+      dateFinPicker.set('minDate', dateStr);
+      
+      // Mettre à jour le calendrier d'aperçu
+      updateCalendarRange();
+      
+      // Mettre à jour les occurrences
+      updateOccurrences();
+    }
+  });
+
+  // Datepicker pour la date de fin
+  const dateFinPicker = flatpickr("#dateFin", {
+    altInput: true,
+    altFormat: "j F Y",
+    dateFormat: "Y-m-d",
+    locale: "fr",
+    disableMobile: true,
+    minDate: today,
+    onChange: function() {
+      // Mettre à jour le calendrier d'aperçu
+      updateCalendarRange();
+      
+      // Mettre à jour les occurrences
+      updateOccurrences();
+    }
+  });
+
+  // Fonction pour mettre à jour l'intervalle affiché dans le calendrier
+  function updateCalendarRange() {
+    const dateDebut = $('#dateDebut').val();
+    const dateFin = $('#dateFin').val();
+    
+    if (dateDebut) {
+      isUpdatingFromDateInputs = true; // Éviter les mises à jour circulaires
+      
+      try {
+        if (dateFin) {
+          // Si les deux dates sont définies, utiliser un tableau de dates
+          calendarPicker.set('mode', 'range');
+          calendarPicker.setDate([dateDebut, dateFin]);
+        } else {
+          // Si seule la date de début est définie
+          calendarPicker.set('mode', 'single');
+          calendarPicker.setDate(dateDebut);
+        }
+      } finally {
+        isUpdatingFromDateInputs = false;
+      }
+    }
+  }
+
+  // Gérer l'affichage des options selon la périodicité
+  $('#periodicite').on('change', function() {
+    const periodicite = $(this).val();
+    
+    // Masquer toutes les options
+    $('.periodicite-options').addClass('d-none');
+    
+    // Afficher les options correspondantes
+    $(`#options-${periodicite}`).removeClass('d-none');
+    
+    // Mettre à jour le texte d'unité de fréquence
+    updateUniteFrequence(periodicite);
+    
+    // Mettre à jour l'aide à la fréquence
+    updateFrequenceHelp();
+    
+    // Mettre à jour les occurrences
+    updateOccurrences();
+  });
+
+  // Fonction pour mettre à jour l'unité de fréquence
+  function updateUniteFrequence(periodicite) {
+    let unite = '';
+    switch(periodicite) {
+      case 'quotidienne':
+        unite = 'jour(s)';
+        break;
+      case 'hebdomadaire':
+        unite = 'semaine(s)';
+        break;
+      case 'mensuelle':
+        unite = 'mois';
+        break;
+      case 'trimestrielle':
+        unite = 'trimestre(s)';
+        break;
+      case 'semestrielle':
+        unite = 'semestre(s)';
+        break;
+      case 'annuelle':
+        unite = 'an(s)';
+        break;
+      case 'personnalisee':
+        unite = 'jours';
+        break;
+      default:
+        unite = '';
+    }
+    $('#unite-frequence').text(unite);
+  }
+  
+  // Toggle affichage horaires
+  $('#touteJournee').on('change', function() {
+    $('#horaireSection').toggleClass('d-none', this.checked);
+    updateOccurrences();
+  });
+  
+  // Options quotidiennes - jours personnalisés
+  $('input[name="option_quotidien"]').on('change', function() {
+    $('#jour-personnalises-selection').toggleClass('d-none', $(this).val() !== 'personnalises');
+    updateOccurrences();
+  });
+  
+  // Sélection de jours personnalisés
+  $('.day-button').on('click', function() {
+    $(this).toggleClass('active');
+    updateOccurrences();
+  });
+  
+  // Au moins un jour sélectionné pour les options hebdomadaires
+  $('.jour-semaine-check').on('change', function() {
+    if ($('.jour-semaine-check:checked').length === 0) {
+      $('#lundi').prop('checked', true);
+    }
+    updateOccurrences();
+  });
+  
+  // Toggle type de récurrence mensuelle
+  $('input[name="type_recurrence"]').on('change', function() {
+    const isJourMois = $('#jour_fixe_mois').prop('checked');
+    $('#jourMoisSection').toggleClass('d-none', !isJourMois);
+    $('#jourSemaineSection').toggleClass('d-none', isJourMois);
+    updateOccurrences();
+  });
+  
+  // Toggle type de récurrence annuelle
+  $('input[name="option_annuel"]').on('change', function() {
+    const isDateFixe = $('#jour_mois_fixe').prop('checked');
+    $('#jourSemaineAnnuelSection').toggleClass('d-none', isDateFixe);
+    updateOccurrences();
+  });
+  
+  // Mettre à jour le texte d'aide de fréquence
+  $('#periodicite, #frequence').on('change', function() {
+    updateFrequenceHelp();
+    updateOccurrences();
+  });
+  
+  // Mettre à jour les occurrences lors des changements de paramètres
+  $('#jourMois, #rangSemaine, #jourSemaineMensuel, #heureDebut, #heureFin, #joursPersonnalises, #exclure_weekends, #moisAnnuel, #jourMoisAnnuel, #rangSemaineAnnuel, #jourSemaineAnnuel, #moisAnnuelJour').on('change', function() {
+    updateOccurrences();
+  });
+  
+  // Fonction pour mettre à jour le texte d'aide pour la fréquence
+  function updateFrequenceHelp() {
+    const periodicite = $('#periodicite').val();
+    const frequence = $('#frequence').val();
+    let texte = 'Le plan s\'exécutera ';
+    
+    switch(periodicite) {
+      case 'ponctuelle':
+        texte = 'Le plan s\'exécutera une seule fois';
+        break;
+      case 'quotidienne':
+        texte += frequence > 1 ? `tous les ${frequence} jours` : 'tous les jours';
+        break;
+      case 'hebdomadaire':
+        texte += frequence > 1 ? `toutes les ${frequence} semaines` : 'toutes les semaines';
+        break;
+      case 'mensuelle':
+        texte += frequence > 1 ? `tous les ${frequence} mois` : 'tous les mois';
+        break;
+      case 'trimestrielle':
+        texte += frequence > 1 ? `tous les ${frequence} trimestres` : 'tous les trimestres';
+        break;
+      case 'semestrielle':
+        texte += frequence > 1 ? `tous les ${frequence} semestres` : 'tous les semestres';
+        break;
+      case 'annuelle':
+        texte += frequence > 1 ? `tous les ${frequence} ans` : 'tous les ans';
+        break;
+      case 'personnalisee':
+        const jours = $('#joursPersonnalises').val() || frequence;
+        texte += `tous les ${jours} jours`;
+        break;
+    }
+    
+    $('#frequenceHelp').text(texte);
+  }
+  
+  // Fonction pour calculer et afficher les prochaines occurrences
+  function updateOccurrences() {
+    const dateDebut = $('#dateDebut').val();
+    if (!dateDebut) return;
+    
+    const dateFin = $('#dateFin').val();
+    const periodicite = $('#periodicite').val();
+    const frequence = parseInt($('#frequence').val()) || 1;
+    
+    let occurrences = [];
+    
+    // Calcul des occurrences selon la périodicité
+    switch (periodicite) {
+      case 'ponctuelle':
+        occurrences = [dayjs(dateDebut)];
+        break;
+        
+      case 'quotidienne':
+        const optionQuotidien = $('input[name="option_quotidien"]:checked').val();
+        
+        if (optionQuotidien === 'tous') {
+          // Tous les jours
+          occurrences = calculerOccurrencesQuotidiennes(dateDebut, dateFin, frequence, [], false);
+        } else if (optionQuotidien === 'ouvrables') {
+          // Jours ouvrables uniquement (lun-ven)
+          occurrences = calculerOccurrencesQuotidiennes(dateDebut, dateFin, frequence, [0, 6], false);
+        } else if (optionQuotidien === 'personnalises') {
+          // Jours personnalisés
+          const joursExclus = [];
+          $('.day-button').each(function() {
+            if (!$(this).hasClass('active')) {
+              joursExclus.push(parseInt($(this).data('day')));
+            }
+          });
+          occurrences = calculerOccurrencesQuotidiennes(dateDebut, dateFin, frequence, joursExclus, false);
+        }
+        break;
+        
+      case 'hebdomadaire':
+        const joursSelectionnes = [];
+        $('.jour-semaine-check:checked').each(function() {
+          const jourValue = $(this).val();
+          // Mapping des jours de la semaine aux indices (0=dimanche, 1=lundi, etc.)
+          const jourIndices = {
+            'dimanche': 0, 'lundi': 1, 'mardi': 2, 'mercredi': 3, 
+            'jeudi': 4, 'vendredi': 5, 'samedi': 6
+          };
+          joursSelectionnes.push(jourIndices[jourValue]);
+        });
+        
+        occurrences = calculerOccurrencesHebdomadaires(dateDebut, dateFin, frequence, joursSelectionnes);
+        break;
+        
+      case 'mensuelle':
+        const typeRecurrence = $('input[name="type_recurrence"]:checked').val();
+        
+        if (typeRecurrence === 'jour_du_mois') {
+          // Même jour du mois
+          const jourMois = parseInt($('#jourMois').val());
+          occurrences = calculerOccurrencesMensuellesJourFixe(dateDebut, dateFin, frequence, jourMois);
+        } else {
+          // Même jour de semaine du mois
+          const rangSemaine = $('#rangSemaine').val();
+          const jourSemaine = $('#jourSemaineMensuel').val();
+          occurrences = calculerOccurrencesMensuellesJourSemaine(dateDebut, dateFin, frequence, rangSemaine, jourSemaine);
+        }
+        break;
+        
+      case 'trimestrielle':
+      case 'semestrielle':
+        // Utiliser la logique mensuelle mais avec fréquence adaptée
+        const multiplier = periodicite === 'trimestrielle' ? 3 : 6;
+        const typeRecurrenceTri = $('input[name="type_recurrence"]:checked').val();
+        
+        if (typeRecurrenceTri === 'jour_du_mois') {
+          const jourMoisTri = parseInt($('#jourMois').val());
+          occurrences = calculerOccurrencesMensuellesJourFixe(dateDebut, dateFin, frequence * multiplier, jourMoisTri);
+        } else {
+          const rangSemaineTri = $('#rangSemaine').val();
+          const jourSemaineTri = $('#jourSemaineMensuel').val();
+          occurrences = calculerOccurrencesMensuellesJourSemaine(dateDebut, dateFin, frequence * multiplier, rangSemaineTri, jourSemaineTri);
+        }
+        break;
+        
+      case 'annuelle':
+        const optionAnnuel = $('input[name="option_annuel"]:checked').val();
+        
+        if (optionAnnuel === 'date_fixe') {
+          // Date fixe chaque année
+          const moisAnnuel = parseInt($('#moisAnnuel').val());
+          const jourMoisAnnuel = parseInt($('#jourMoisAnnuel').val());
+          occurrences = calculerOccurrencesAnnuellesDateFixe(dateDebut, dateFin, frequence, moisAnnuel, jourMoisAnnuel);
+        } else {
+          // Jour de semaine spécifique
+          // Jour de semaine spécifique
+          const rangSemaineAnnuel = $('#rangSemaineAnnuel').val();
+          const jourSemaineAnnuel = $('#jourSemaineAnnuel').val();
+          const moisAnnuelJour = parseInt($('#moisAnnuelJour').val());
+          occurrences = calculerOccurrencesAnnuellesJourSemaine(dateDebut, dateFin, frequence, rangSemaineAnnuel, jourSemaineAnnuel, moisAnnuelJour);
+        }
+        break;
+        
+      case 'personnalisee':
+        // Intervalle personnalisé en jours
+        const joursPerso = parseInt($('#joursPersonnalises').val()) || frequence;
+        const exclureWeekends = $('#exclure_weekends').prop('checked');
+        occurrences = calculerOccurrencesQuotidiennes(dateDebut, dateFin, joursPerso, exclureWeekends ? [0, 6] : [], true);
+        break;
+    }
+    
+    // Limiter à 5 occurrences pour l'affichage
+    occurrences = occurrences.slice(0, 5);
+    
+    // Afficher les occurrences
+    afficherOccurrences(occurrences);
+    
+    // Marquer les occurrences dans le calendrier
+    marquerOccurrencesCalendrier(occurrences);
+  }
+  
+  // Fonction pour calculer les occurrences quotidiennes
+  function calculerOccurrencesQuotidiennes(dateDebut, dateFin, frequence, joursExclus, isPersonnalise) {
+    let occurrences = [];
+    let currentDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : currentDate.add(1, 'year');
+    let count = 0;
+    
+    while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
+      if (count >= 10) break; // Éviter les boucles infinies
+      
+      // Vérifier si le jour n'est pas exclu
+      if (!joursExclus.includes(currentDate.day())) {
+        occurrences.push(currentDate);
+      }
+      
+      // Passer au jour suivant selon la fréquence
+      if (isPersonnalise) {
+        // Pour la périodicité personnalisée, on avance toujours du nombre de jours spécifié
+        currentDate = currentDate.add(frequence, 'day');
+      } else {
+        // Pour la périodicité quotidienne standard
+        let nextDate = currentDate.add(frequence, 'day');
+        
+        // Si le jour est exclu, trouver le prochain jour valide
+        while (joursExclus.includes(nextDate.day())) {
+          nextDate = nextDate.add(1, 'day');
+        }
+        
+        currentDate = nextDate;
+      }
+      
+      count++;
+    }
+    
+    return occurrences;
+  }
+  
+  // Fonction pour calculer les occurrences hebdomadaires
+  function calculerOccurrencesHebdomadaires(dateDebut, dateFin, frequence, joursSelectionnes) {
+    let occurrences = [];
+    let startDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : startDate.add(1, 'year');
+    
+    // S'assurer qu'au moins un jour est sélectionné
+    if (joursSelectionnes.length === 0) {
+      joursSelectionnes.push(1); // Lundi par défaut
+    }
+    
+    // Trouver la date de début effective (premier jour sélectionné à partir de la date de début)
+    let premierJour = null;
+    let dateDebutEffective = startDate.clone();
+    
+    // Vérifier chaque jour de la semaine courante
+    for (let i = 0; i < 7; i++) {
+      const currentDay = dateDebutEffective.day();
+      if (joursSelectionnes.includes(currentDay)) {
+        premierJour = dateDebutEffective.clone();
+        break;
+      }
+      dateDebutEffective = dateDebutEffective.add(1, 'day');
+    }
+    
+    // Si aucun jour n'est trouvé dans la semaine courante, aller à la semaine suivante
+    if (!premierJour) {
+      dateDebutEffective = startDate.add(1, 'week').startOf('week');
+      premierJour = dateDebutEffective.day(joursSelectionnes[0]);
+    }
+    
+    // Calculer les occurrences
+    let currentWeek = 0;
+    let currentDate = premierJour;
+    
+    while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
+      if (occurrences.length >= 10) break; // Éviter les boucles infinies
+      
+      // Vérifier si nous sommes dans une semaine à inclure (selon la fréquence)
+      if (currentWeek % frequence === 0) {
+        // Pour chaque jour sélectionné dans cette semaine
+        for (const day of joursSelectionnes) {
+          const dateForDay = currentDate.day(day);
+          
+          // Ne pas ajouter de dates antérieures à la date de début
+          if (dateForDay.isBefore(startDate)) continue;
+          
+          // Ne pas dépasser la date de fin
+          if (dateFin && dateForDay.isAfter(endDate)) break;
+          
+          occurrences.push(dateForDay);
+        }
+      }
+      
+      // Passer à la semaine suivante
+      currentDate = currentDate.add(1, 'week').day(joursSelectionnes[0]);
+      currentWeek++;
+    }
+    
+    // Trier les occurrences par date
+    occurrences.sort((a, b) => a.valueOf() - b.valueOf());
+    
+    return occurrences;
+  }
+  
+  // Fonction pour calculer les occurrences mensuelles avec jour fixe
+  function calculerOccurrencesMensuellesJourFixe(dateDebut, dateFin, frequence, jourMois) {
+    let occurrences = [];
+    let currentDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : currentDate.add(1, 'year');
+    
+    // Trouver la première occurrence (si le jour du mois est déjà passé, aller au mois suivant)
+    if (currentDate.date() > jourMois) {
+      currentDate = currentDate.add(1, 'month').date(1);
+    }
+    
+    // Définir le jour du mois pour la première occurrence
+    currentDate = currentDate.date(Math.min(jourMois, currentDate.daysInMonth()));
+    
+    // Calculer les occurrences
+    while ((currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) && occurrences.length < 10) {
+      // Vérifier si la date est après la date de début
+      if (currentDate.isAfter(dayjs(dateDebut)) || currentDate.isSame(dayjs(dateDebut), 'day')) {
+        occurrences.push(currentDate);
+      }
+      
+      // Avancer au mois suivant selon la fréquence
+      let nextMonth = currentDate.add(frequence, 'month');
+      
+      // Ajuster le jour si nécessaire (ex: 31 janvier -> 28/29 février)
+      currentDate = nextMonth.date(Math.min(jourMois, nextMonth.daysInMonth()));
+    }
+    
+    return occurrences;
+  }
+  
+  // Fonction pour calculer les occurrences mensuelles avec jour de semaine
+  function calculerOccurrencesMensuellesJourSemaine(dateDebut, dateFin, frequence, rangSemaine, jourSemaine) {
+    let occurrences = [];
+    let startDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : startDate.add(1, 'year');
+    
+    // Mapping des jours de la semaine aux indices dayjs
+    const jourIndices = {
+      'lundi': 1, 'mardi': 2, 'mercredi': 3, 'jeudi': 4,
+      'vendredi': 5, 'samedi': 6, 'dimanche': 0
+    };
+    
+    const dayIndex = jourIndices[jourSemaine];
+    let currentMonth = startDate.date(1); // Début du mois de la date de début
+    
+    while ((currentMonth.isBefore(endDate) || currentMonth.isSame(endDate, 'month')) && occurrences.length < 10) {
+      // Trouver le jour spécifique dans le mois courant
+      let targetDate;
+      
+      if (rangSemaine === 'last') {
+        // Dernier jour spécifique du mois
+        let lastDayOfMonth = currentMonth.endOf('month');
+        let lastDayIndex = lastDayOfMonth.day();
+        
+        // Reculer au jour spécifié
+        let daysToSubtract = (lastDayIndex - dayIndex + 7) % 7;
+        targetDate = lastDayOfMonth.subtract(daysToSubtract, 'day');
+      } else {
+        // Trouver le premier jour spécifique du mois
+        let firstDayOfType = currentMonth.day(dayIndex);
+        
+        // Si ce jour est avant le début du mois, avancer d'une semaine
+        if (firstDayOfType.isBefore(currentMonth)) {
+          firstDayOfType = firstDayOfType.add(7, 'day');
+        }
+        
+        // Ajouter les semaines nécessaires pour atteindre le rang spécifié
+        targetDate = firstDayOfType.add((parseInt(rangSemaine) - 1) * 7, 'day');
+      }
+      
+      // Ajouter si c'est après la date de début et dans le mois courant
+      if ((targetDate.isAfter(startDate) || targetDate.isSame(startDate, 'day')) && 
+          targetDate.month() === currentMonth.month()) {
+        occurrences.push(targetDate);
+      }
+      
+      // Avancer au mois suivant selon la fréquence
+      currentMonth = currentMonth.add(frequence, 'month');
+    }
+    
+    return occurrences;
+  }
+  
+  // Fonction pour calculer les occurrences annuelles avec date fixe
+  function calculerOccurrencesAnnuellesDateFixe(dateDebut, dateFin, frequence, mois, jour) {
+    let occurrences = [];
+    let startDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : startDate.add(5, 'year');
+    let currentYear = startDate.year();
+    
+    while (currentYear <= endDate.year() && occurrences.length < 10) {
+      // Créer la date pour cette année
+      let targetDate = dayjs().year(currentYear).month(mois - 1).date(jour);
+      
+      // Vérifier si le jour est valide (ex: 29 février sur année non bissextile)
+      if (targetDate.month() !== mois - 1) {
+        targetDate = targetDate.date(targetDate.daysInMonth());
+      }
+      
+      // Ajouter si c'est après la date de début et avant la date de fin
+      if ((targetDate.isAfter(startDate) || targetDate.isSame(startDate, 'day')) && 
+          (targetDate.isBefore(endDate) || targetDate.isSame(endDate, 'day'))) {
+        occurrences.push(targetDate);
+      }
+      
+      // Avancer à l'année suivante selon la fréquence
+      currentYear += frequence;
+    }
+    
+    return occurrences;
+  }
+  
+  // Fonction pour calculer les occurrences annuelles avec jour de semaine
+  function calculerOccurrencesAnnuellesJourSemaine(dateDebut, dateFin, frequence, rangSemaine, jourSemaine, mois) {
+    let occurrences = [];
+    let startDate = dayjs(dateDebut);
+    const endDate = dateFin ? dayjs(dateFin) : startDate.add(5, 'year');
+    let currentYear = startDate.year();
+    
+    // Mapping des jours de la semaine aux indices dayjs
+    const jourIndices = {
+      'lundi': 1, 'mardi': 2, 'mercredi': 3, 'jeudi': 4,
+      'vendredi': 5, 'samedi': 6, 'dimanche': 0
+    };
+    
+    const dayIndex = jourIndices[jourSemaine];
+    
+    while (currentYear <= endDate.year() && occurrences.length < 10) {
+      // Début du mois spécifié pour l'année courante
+      let currentMonth = dayjs().year(currentYear).month(mois - 1).date(1);
+      
+      // Trouver le jour spécifique dans ce mois
+      let targetDate;
+      
+      if (rangSemaine === 'last') {
+        // Dernier jour spécifique du mois
+        let lastDayOfMonth = currentMonth.endOf('month');
+        let lastDayIndex = lastDayOfMonth.day();
+        
+        // Reculer jusqu'au jour spécifié
+        let daysToSubtract = (lastDayIndex - dayIndex + 7) % 7;
+        targetDate = lastDayOfMonth.subtract(daysToSubtract, 'day');
+      } else {
+        // Trouver le premier jour spécifique du mois
+        let firstDayOfType = currentMonth.day(dayIndex);
+        
+        // Si ce jour est avant le début du mois, avancer d'une semaine
+        if (firstDayOfType.isBefore(currentMonth)) {
+          firstDayOfType = firstDayOfType.add(7, 'day');
+        }
+        
+        // Ajouter les semaines nécessaires pour atteindre le rang spécifié
+        targetDate = firstDayOfType.add((parseInt(rangSemaine) - 1) * 7, 'day');
+      }
+      
+      // Ajouter si c'est après la date de début et avant la date de fin
+      if ((targetDate.isAfter(startDate) || targetDate.isSame(startDate, 'day')) && 
+          (targetDate.isBefore(endDate) || targetDate.isSame(endDate, 'day'))) {
+        occurrences.push(targetDate);
+      }
+      
+      // Avancer à l'année suivante selon la fréquence
+      currentYear += frequence;
+    }
+    
+    return occurrences;
+  }
+  
+  // Fonction pour afficher les occurrences calculées
+  function afficherOccurrences(occurrences) {
+    const container = $('#occurrenceContainer');
+    container.empty();
+    
+    // Afficher l'intervalle du plan de maintenance
+    const dateDebut = $('#dateDebut').val();
+    const dateFin = $('#dateFin').val();
+    
+    if (dateDebut) {
+      const dateDebutFormatted = dayjs(dateDebut).format('DD MMM YYYY');
+      let intervalleText = `<p><strong>Plan de maintenance:</strong> débute le ${dateDebutFormatted}`;
+      
+      if (dateFin) {
+        const dateFinFormatted = dayjs(dateFin).format('DD MMM YYYY');
+        intervalleText += ` et se termine le ${dateFinFormatted}`;
+      } else {
+        intervalleText += ` (sans date de fin)`;
+      }
+      
+      intervalleText += `</p>`;
+      container.append(intervalleText);
+    }
+    
+    // Afficher les prochaines occurrences
+    if (occurrences.length === 0) {
+      container.append('<p>Aucune occurrence calculée.</p>');
+      return;
+    }
+    
+    container.append('<p><strong>Prochaines interventions:</strong></p>');
+    
+    const touteJournee = $('#touteJournee').prop('checked');
+    let heureDebut = '';
+    let heureFin = '';
+    
+    if (!touteJournee) {
+      heureDebut = $('#heureDebut').val();
+      heureFin = $('#heureFin').val();
+    }
+    
+    occurrences.forEach(date => {
+      let dateStr = date.format('DD MMM YYYY');
+      let timeStr = touteJournee ? 
+                    '<span class="badge bg-info text-white ms-2">Toute la journée</span>' : 
+                    `<span class="badge bg-light text-dark ms-2">${heureDebut} - ${heureFin}</span>`;
+      
+      container.append(`<div class="occurrence-date">${dateStr} ${timeStr}</div>`);
+    });
+  }
+  
+  // Fonction pour marquer les occurrences dans le calendrier
+  function marquerOccurrencesCalendrier(occurrences) {
+    // Cette fonction peut être implémentée si votre version de flatpickr supporte
+    // le marquage personnalisé des dates (via l'option onDayCreate)
+    // Pour l'instant, nous utilisons l'API de flatpickr pour mettre en évidence les dates
+    
+    // Réinitialiser l'affichage des dates
+    calendarPicker.redraw();
+  }
+  
+  $('#toggleOptions').on('click', function() {
+    $('#optionsAvancees').slideToggle(300);
+    
+    // Changer l'icône
+    const icon = $(this).find('i');
+    if (icon.hasClass('bi-chevron-down')) {
+      icon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+    } else {
+      icon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+    }
+  });
+
+  // Ajouter/supprimer les étapes de la checklist
+  $('#ajouterEtape').on('click', function() {
+    const index = $('.checklist-item').length + 1;
+    const newItem = `
+      <div class="card p-3 mb-3 checklist-item">
+        <div class="d-flex mb-2">
+          <span class="badge bg-primary me-2">${index}</span>
+          <input type="text" name="checklist_titre[]" class="form-control" placeholder="Titre de l'étape">
+          <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-step"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <textarea name="checklist_details[]" class="form-control" rows="2" placeholder="Description détaillée de l'étape..."></textarea>
+      </div>
+    `;
+    $('#checklist-container').append(newItem);
+  });
+  
+  $(document).on('click', '.remove-step', function() {
+    $(this).closest('.checklist-item').remove();
+    // Réindexer les étapes
+    $('.checklist-item').each(function(index) {
+      $(this).find('.badge').text(index + 1);
+    });
+  });
+  
+  // Fonction pour générer le résumé avant validation
+  function generateResume() {
+    const resume = $('#resume');
+    resume.empty();
+    
+    const titre = $('input[name="titre"]').val() || '(Non défini)';
+    const typeMaintenance = $('#type_maintenance option:selected').text();
+    const priorite = $('#priorite option:selected').text();
+    const description = $('textarea[name="description"]').val() || '(Non définie)';
+    const periodicite = $('#periodicite option:selected').text();
+    const frequence = $('#frequence').val();
+    const dateDebut = $('#dateDebut').val() ? dayjs($('#dateDebut').val()).format('DD/MM/YYYY') : '(Non définie)';
+    const dateFin = $('#dateFin').val() ? dayjs($('#dateFin').val()).format('DD/MM/YYYY') : 'Aucune';
+    
+    // Collecter les labels
+    const labels = [];
+    $('select[name="labels"] option:selected').each(function() {
+      labels.push($(this).text());
+    });
+    
+    // Collecter les techniciens
+    const techniciens = [];
+    $('select[name="techniciens"] option:selected').each(function() {
+      techniciens.push($(this).text());
+    });
+    
+    // Collecter les étapes de la checklist
+    const etapes = [];
+    $('.checklist-item').each(function() {
+      const titre = $(this).find('input[name="checklist_titre[]"]').val();
+      if (titre) {
+        etapes.push(titre);
+      }
+    });
+    
+    let html = `
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <h5 class="mb-3">Informations générales</h5>
+          <p><strong>Titre:</strong> ${titre}</p>
+          <p><strong>Type:</strong> ${typeMaintenance}</p>
+          <p><strong>Priorité:</strong> <span class="badge ${priorite === 'Urgente' ? 'bg-danger' : priorite === 'Haute' ? 'bg-warning' : priorite === 'Normale' ? 'bg-primary' : 'bg-secondary'}">${priorite}</span></p>
+          <p><strong>Description:</strong> ${description}</p>
+          <p><strong>Labels:</strong> ${labels.length > 0 ? labels.map(l => `<span class="task-tag">${l}</span>`).join('') : 'Aucun'}</p>
+        </div>
+        <div class="col-md-6">
+          <h5 class="mb-3">Planification</h5>
+          <p><strong>Périodicité:</strong> ${periodicite} (tous les ${frequence} ${periodicite.toLowerCase()})</p>
+          <p><strong>Date de début:</strong> ${dateDebut}</p>
+          <p><strong>Date de fin:</strong> ${dateFin}</p>
+          <p><strong>Durée estimée:</strong> ${$('input[name="temps_execution"]').val() || '60'} minutes</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h5 class="mb-3">Personnel assigné</h5>
+          <p><strong>Techniciens:</strong> ${techniciens.length > 0 ? techniciens.join(', ') : 'Aucun technicien assigné'}</p>
+          <p><strong>Équipe:</strong> ${$('select[name="equipe_responsable"] option:selected').text()}</p>
+        </div>
+        <div class="col-md-6">
+          <h5 class="mb-3">Checklist (${etapes.length} étapes)</h5>
+          ${etapes.length > 0 ? '<ul class="mb-0">' + etapes.map(e => `<li>${e}</li>`).join('') + '</ul>' : 'Aucune étape définie'}
+        </div>
+      </div>
+    `;
+    
+    resume.html(html);
+  }
+  
+  // Mettre à jour le résumé avant d'afficher l'étape 5
+  $('button[onclick="changeStep(5)"]').on('click', function() {
+    generateResume();
+  });
+  // Initialiser la périodicité, l'aide à la fréquence et les occurrences
+  $('#periodicite').trigger('change');
+  $('#lundi').prop('checked', true);
+  updateFrequenceHelp();
+  
+  // Forcer la mise à jour initiale du calendrier après un court délai
+  setTimeout(function() {
+    updateCalendarRange();
+    updateOccurrences();
+  }, 200);
+});
+
+
+// Fonction pour changer d'étape
+function changeStep(step) {
+  // D'abord, désactiver toutes les étapes
+  document.querySelectorAll('.card-step').forEach(function(card) {
+    card.classList.remove('active');
+  });
+
+  // Activer l'étape sélectionnée
+  document.getElementById('step-' + step).classList.add('active');
+
+  // Mettre à jour l'en-tête
+  document.querySelectorAll('.step-header div').forEach(function(header) {
+    header.classList.remove('active');
+  });
+  document.getElementById('title-' + step).classList.add('active');
+
+  // Mettre à jour la barre de progression
+  const percent = step * 20;
+  document.getElementById('progressBar').style.width = percent + '%';
+}
+</script>
+{% endblock %}

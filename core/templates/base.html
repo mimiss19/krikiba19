@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMAO - Gestion Maintenance</title>
+
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+  <!-- Styles personnalisés -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/machines.css' %}">
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f8fc;
+    }
+
+    .nav-active {
+      background: linear-gradient(to right, #7b1fa2, #ab47bc);
+      color: white !important;
+      font-weight: 600;
+      border-radius: 0.375rem;
+    }
+
+    .sidebar a {
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-gray-800 flex">
+
+  <!-- 🌈 Sidebar -->
+  <aside class="sidebar w-64 h-screen bg-gradient-to-r from-purple-700 to-fuchsia-700 text-white fixed left-0 top-0 flex flex-col justify-between shadow-lg">
+    <div>
+      <!-- Logo + titre -->
+      <div class="flex items-center gap-2 px-6 py-4 border-b border-fuchsia-600">
+        <img src="{% static 'img/logo.svg' %}" alt="Logo GMAO" height="50">
+      </div>
+
+      <!-- Menu -->
+      <nav class="mt-6">
+        <ul class="space-y-1 text-sm px-4">
+          <li>
+            <a href="{% url 'accueil' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'accueil' %}nav-active{% endif %}">
+              <i class="fa fa-home w-5"></i> Accueil
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'machines' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'machines' %}nav-active{% endif %}">
+              <i class="fa fa-screwdriver-wrench w-5"></i> Machines
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'pieces' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'pieces' %}nav-active{% endif %}">
+              <i class="fa fa-cubes w-5"></i> Pièces
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'interventions' %}" class="{% if request.path == '/interventions/' %}bg-fuchsia-600 text-white{% endif %} flex items-center gap-2 py-2 px-4 rounded hover:bg-fuchsia-500 transition">
+                <i class="fa fa-wrench"></i>
+                <span>Interventions</span>
+            </a>
+        </li>        
+          <li>
+            <a href="{% url 'import_excel' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'import_excel' %}nav-active{% endif %}">
+              <i class="fa fa-file-import w-5"></i> Import
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'liste_plans_maintenance' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'liste_plans' %}bg-purple-900 text-white{% endif %}">
+              <i class="fa fa-tools w-5"></i> Plans de maintenance
+            </a>
+          </li>          
+          <li>
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-2 {% if request.resolver_match.url_name == 'dashboard' %}nav-active{% endif %}">
+    
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- User connecté -->
+    <div class="px-6 py-3 border-t border-fuchsia-600 text-sm flex items-center gap-2">
+      <i class="fa fa-user-circle"></i>
+      <span>Technicien connecté</span>
+    </div>
+  </aside>
+
+  <!-- 📄 Contenu principal -->
+  <div class="flex-1 ml-64 flex flex-col min-h-screen">
+
+    <!-- Topbar -->
+    <header class="bg-gradient-to-r from-purple-700 to-fuchsia-700 shadow-md px-6 py-3 flex justify-between items-center">
+      <input type="text" placeholder="Rechercher une machine ou une pièce..."
+             class="w-1/2 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500">
+
+      <div class="flex gap-4 items-center text-sm">
+        <div class="relative">
+          <button onclick="toggleNotifications()" class="relative text-white focus:outline-none">
+            <i class="fa fa-bell text-xl"></i>
+            <span id="notifCount" class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 py-0.5 shadow hidden">
+            </span>
+          </button>
+        
+          <!-- Dropdown notifications box -->
+          <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white text-gray-800 rounded-lg shadow-lg z-50 border border-gray-300 max-h-80 overflow-y-auto">
+            <div class="p-3 border-b font-semibold text-purple-700">🔔 Interventions à venir</div>
+            <ul id="notifList" class="divide-y divide-gray-200"></ul>
+          </div>
+        </div>
+        <span class="text-white"><i class="fa fa-envelope"></i> Messages</span>
+        <span class="text-white"><i class="fa fa-user"></i> Admin</span>
+        <span class="text-white"><i class="fa fa-language"></i> FR</span>
+        <form method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
+              <i class="fa fa-sign-out-alt"></i> Déconnexion
+          </button>
+      </form>
+      
+      </div>
+    </header>
+
+    <!-- 👇 Bloc de contenu -->
+    <main class="p-6 bg-gray-100 flex-1 overflow-y-auto">
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-gray-500 py-4 bg-white border-t">
+      © 2025 GMAO – Dépôt de fabrication des écrous
+    </footer>
+  </div>
+  <script>
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notifDropdown');
+      dropdown.classList.toggle('hidden');
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('/api/alertes-jour/')
+        .then(response => response.json())
+        .then(data => {
+          const notif = document.getElementById('notifCount');
+          const notifList = document.getElementById('notifList');
+    
+          if (data.interventions.length > 0) {
+            notif.textContent = data.interventions.length;
+            notif.classList.remove('hidden');
+            notifList.innerHTML = '';
+    
+            data.interventions.forEach(interv => {
+              notifList.innerHTML += `
+                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <div class="font-medium">${interv.machine}</div>
+                  <div class="text-sm text-gray-500">${interv.description}</div>
+                  <div class="text-xs text-gray-400">📅 ${interv.date}</div>
+                </li>`;
+            });
+          }
+        });
+    });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h4><i class="bi bi-check-circle-fill"></i> Plan de maintenance créé avec succès !</h4>
+        <p class="mt-3">Votre plan de maintenance a été enregistré.</p>
+        <a href="{% url 'liste_plans_maintenance' %}" class="btn btn-primary mt-4">Voir la liste des plans de maintenance</a>
+    </div>
+</div>
+{% endblock %}

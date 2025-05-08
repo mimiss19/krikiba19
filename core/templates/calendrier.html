@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-purple-700">📅 Calendrier des interventions</h2>
+    <div id="calendar" class="rounded-lg shadow-md"></div>
+</div>
+
+<!-- FullCalendar Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'fr',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,listWeek'
+      },
+      events: '/api/interventions-json/'
+    });
+
+    calendar.render();
+  });
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow p-4 mb-5">
+    <h2 class="mb-4 text-center text-uppercase" style="color:#581845;"><i class="fas fa-cogs"></i> Fiche machine : {{ machine.nom }}</h2>
+
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong><i class="fas fa-industry"></i> Type :</strong> {{ machine.get_type_display }}</p>
+        <p><strong><i class="fas fa-map-marker-alt"></i> Emplacement :</strong> {{ machine.emplacement }}</p>
+        <p><strong><i class="fas fa-calendar-check"></i> Dernière maintenance :</strong> {{ machine.derniere_maintenance }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong><i class="fas fa-calendar-alt"></i> Prochaine maintenance :</strong> {{ machine.prochaine_maintenance }}</p>
+        <p><strong><i class="fas fa-hourglass-half"></i> Jours restants :</strong> {{ machine.jours_restant }} jours</p>
+        <p>
+          <strong><i class="fas fa-exclamation-triangle"></i> Alerte :</strong> 
+          {% if machine.alerte_maintenance == "🔴 En retard" %}
+            <span class="badge badge-danger">{{ machine.alerte_maintenance }}</span>
+          {% elif machine.alerte_maintenance == "🟡 Bientôt" %}
+            <span class="badge badge-warning">{{ machine.alerte_maintenance }}</span>
+          {% elif machine.alerte_maintenance == "🟢 OK" %}
+            <span class="badge badge-success">{{ machine.alerte_maintenance }}</span>
+          {% else %}
+            <span class="badge badge-secondary">{{ machine.alerte_maintenance }}</span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <hr>
+
+    <h4 class="mt-4"><i class="fas fa-wrench"></i> Historique des maintenances</h4>
+    <ul class="list-group mb-4">
+      {% for m in maintenances %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ m.titre }} ({{ m.date_derniere_realisation|default:"Pas encore réalisée" }})
+          <span class="badge badge-info">{{ m.get_statut_display }}</span>
+        </li>
+      {% empty %}
+        <li class="list-group-item">Aucune maintenance encore enregistrée.</li>
+      {% endfor %}
+    </ul>
+
+    <h4><i class="fas fa-cogs"></i> Pièces de rechange compatibles</h4>
+    <ul class="list-group">
+      {% for p in pieces %}
+        <li class="list-group-item">
+          <strong>{{ p.code }}</strong> - {{ p.designation }} (Stock : {{ p.quantite_stock }})
+        </li>
+      {% empty %}
+        <li class="list-group-item">Aucune pièce associée à cette machine.</li>
+      {% endfor %}
+    </ul>
+
+    <div class="text-end mt-4">
+      <a href="{% url 'ajouter_intervention' machine.id %}" class="btn btn-warning">
+        <i class="fas fa-plus-circle"></i> Ajouter une intervention
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

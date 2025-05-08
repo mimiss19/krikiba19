@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-fuchsia-700 mb-4">Créer un plan de maintenance</h2>
+
+<form method="POST" action="{% url 'creer_plan_maintenance' %}" class="space-y-6 bg-white p-6 rounded shadow-md">
+  {% csrf_token %}
+
+  <!-- Équipement -->
+  <div>
+    <label for="equipement" class="block font-medium text-gray-700">Équipement</label>
+    <select name="equipement" id="equipement" required class="w-full border border-gray-300 px-3 py-2 rounded mt-1">
+      {% for machine in machines %}
+        <option value="{{ machine.id }}">{{ machine.nom }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Description -->
+  <div>
+    <label for="description" class="block font-medium text-gray-700">Description</label>
+    <textarea name="description" id="description" required rows="3"
+              class="w-full border border-gray-300 px-3 py-2 rounded mt-1"
+              placeholder="Ex : Remplacement filtre, vérification graissage..."></textarea>
+  </div>
+
+  <!-- Réglementaire -->
+  <div class="flex items-center gap-2">
+    <input type="checkbox" id="reglementaire" name="reglementaire" class="h-4 w-4 text-fuchsia-600">
+    <label for="reglementaire" class="text-gray-700">Ce plan est réglementaire</label>
+  </div>
+
+  <!-- Assignation -->
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label for="assignes" class="block font-medium text-gray-700">Personne(s) assignée(s)</label>
+      <select name="assignes" id="assignes" multiple class="w-full border border-gray-300 px-3 py-2 rounded mt-1">
+        {% for user in techniciens %}
+          <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Labels -->
+    <div>
+      <label for="labels" class="block font-medium text-gray-700">Labels</label>
+      <input type="text" name="labels" id="labels" class="w-full border border-gray-300 px-3 py-2 rounded mt-1"
+             placeholder="Ex : Préventif, critique...">
+    </div>
+  </div>
+
+  <!-- Temps estimé -->
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-700 font-medium">Temps de maintenance estimé</label>
+      <div class="flex gap-2">
+        <input type="number" name="temps_maintenance_h" min="0" class="w-1/2 border rounded px-2 py-1"
+               placeholder="Heures">
+        <input type="number" name="temps_maintenance_m" min="0" max="59" class="w-1/2 border rounded px-2 py-1"
+               placeholder="Minutes">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium">Temps d'arrêt estimé</label>
+      <div class="flex gap-2">
+        <input type="number" name="temps_arret_h" min="0" class="w-1/2 border rounded px-2 py-1"
+               placeholder="Heures">
+        <input type="number" name="temps_arret_m" min="0" max="59" class="w-1/2 border rounded px-2 py-1"
+               placeholder="Minutes">
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div>
+    <label for="checklist" class="block font-medium text-gray-700">Checklist (optionnel)</label>
+    <textarea name="checklist" id="checklist" rows="3" class="w-full border border-gray-300 px-3 py-2 rounded mt-1"
+              placeholder="Étapes à suivre pour le technicien..."></textarea>
+  </div>
+
+  <!-- Planning -->
+  <h3 class="text-xl font-semibold text-fuchsia-600 mt-8">Planification</h3>
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label for="frequence" class="block font-medium text-gray-700">Fréquence</label>
+      <input type="number" name="frequence" id="frequence" required class="w-full border px-3 py-2 rounded mt-1"
+             placeholder="Ex: 1">
+    </div>
+    <div>
+      <label for="unite" class="block font-medium text-gray-700">Unité</label>
+      <select name="unite" id="unite" required class="w-full border px-3 py-2 rounded mt-1">
+        <option value="jours">Jour(s)</option>
+        <option value="semaines">Semaine(s)</option>
+        <option value="mois">Mois</option>
+        <option value="annees">Année(s)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mt-4">
+    <div>
+      <label for="date_debut" class="block font-medium text-gray-700">Date de début</label>
+      <input type="date" name="date_debut" id="date_debut" required class="w-full border px-3 py-2 rounded mt-1">
+    </div>
+    <div>
+      <label for="heure_debut" class="block font-medium text-gray-700">Heure de début</label>
+      <input type="time" name="heure_debut" id="heure_debut" required class="w-full border px-3 py-2 rounded mt-1">
+    </div>
+  </div>
+
+  <!-- Boutons -->
+  <div class="flex justify-end mt-6 gap-4">
+    <a href="{% url 'dashboard' %}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Annuler</a>
+    <button type="submit" class="px-6 py-2 bg-fuchsia-600 text-white rounded hover:bg-fuchsia-700">
+      Planifier
+    </button>
+  </div>
+</form>
+{% endblock %}

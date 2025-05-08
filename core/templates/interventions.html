@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-4 text-purple-700">Liste des interventions</h2>
+
+  <form method="POST" class="flex flex-wrap gap-4 mb-6 items-center">
+      {% csrf_token %}
+      <select name="machine" class="border rounded px-3 py-2">
+          {% for m in machines %}
+              <option value="{{ m.id }}">{{ m.nom }}</option>
+          {% endfor %}
+      </select>
+      <input name="description" type="text" placeholder="Description" class="border rounded px-3 py-2" required>
+      <input name="date_planifiee" type="date" class="border rounded px-3 py-2" required>
+      <button type="submit" class="bg-purple-600 text-white rounded px-4 py-2">Ajouter</button>
+  </form>
+
+  <div class="overflow-x-auto">
+      <table class="w-full table-auto text-left border-collapse">
+          <thead class="bg-purple-700 text-white">
+              <tr>
+                  <th class="px-4 py-2">Machine</th>
+                  <th class="px-4 py-2">Description</th>
+                  <th class="px-4 py-2">Date</th>
+                  <th class="px-4 py-2">État final</th>
+                  <th class="px-4 py-2">Date prévue</th>
+                  <th class="px-4 py-2">Statut</th>
+                  <th class="px-4 py-2">Action</th>
+              </tr>
+          </thead>
+          <tbody class="text-gray-700">
+              {% for i in interventions %}
+                  <tr class="border-b hover:bg-purple-50">
+                      <td class="px-4 py-2">{{ i.machine.nom }}</td>
+                      <td class="px-4 py-2">{{ i.description }}</td>
+                      <td class="px-4 py-2">{{ i.date_intervention|default:"-" }}</td>
+                      <td class="px-4 py-2">{{ i.etat_final|default:"-" }}</td>
+                      <td class="px-4 py-2">{{ i.date_planifiee|default:"-" }}</td>
+                      <td class="px-4 py-2">
+                          {% if i.statut == 'planifiee' %}
+                              <i class="fas fa-calendar-alt text-yellow-500"></i> Planifiée
+                          {% elif i.statut == 'en_cours' %}
+                              <i class="fas fa-tools text-blue-500"></i> En cours
+                          {% else %}
+                              <i class="fas fa-check-circle text-green-500"></i> Terminée
+                          {% endif %}
+                      </td>
+                      <td class="text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-3">
+                          {% if i.statut == 'planifiee' %}
+                          <form method="POST" action="{% url 'cloturer_intervention' i.id %}">
+                            {% csrf_token %}
+                            <button
+                              class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition duration-200 shadow-md"
+                              title="Clôturer">
+                              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                                  clip-rule="evenodd" />
+                              </svg>
+                              Clôturer
+                            </button>
+                          </form>
+                          {% endif %}
+                      
+                          <a href="{% url 'modifier_intervention' i.id %}"
+                             class="text-gray-500 hover:text-blue-600 p-1 transition" title="Modifier">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.232 5.232l3.536 3.536M9 11l6 6M3 21h6l12-12a2.828 2.828 0 0 0-4-4L3 21z" />
+                            </svg>
+                          </a>
+
+
+                          <form method="POST" action="{% url 'supprimer_intervention' i.id %}"
+                                onsubmit="return confirm('Confirmer la suppression ?');" class="inline">
+                            {% csrf_token %}
+                            <button class="p-1 rounded-full border border-gray-200 bg-white hover:bg-red-50 transition" title="Supprimer">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500"
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                          </form>
+
+                        </div>
+                      </td>                                                          
+                  </tr>
+              {% empty %}
+                  <tr>
+                      <td colspan="7" class="text-center text-gray-400 py-4">Aucune intervention trouvée.</td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- 🌟 Lien vers le style CSS personnalisé -->
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">📊 Tableau de bord de la Maintenance Préventive</h2>
+
+  <!-- 🔹 KPI Cards -->
+  <div class="row">
+    {% for s in stats %}
+      <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">{{ s.mois }}</h5>
+            <p><strong>🛠 Maintenances :</strong> {{ s.maintenances }}</p>
+            <p><strong>🕐 Temps total :</strong> {{ s.temps_total }} h</p>
+            <p><strong>💰 Coût moyen :</strong> {{ s.cout_moyen }} €</p>
+            <p><strong>✅ Taux conformité :</strong> {{ s.taux_conformite|floatformat:0 }}%</p>
+            <p><strong>⏱ MTBF :</strong> {{ s.mtbf }} h</p>
+            <p><strong>🧰 MTTR :</strong> {{ s.mttr }} h</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🔸 Graphique -->
+  <h4 class="mt-5 mb-3 text-center">📈 Statistiques Mensuelles</h4>
+  <canvas id="maintenanceChart" height="100"></canvas>
+</div>
+
+<!-- 📊 Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const stats = JSON.parse('{{ stats|safe|escapejs }}');
+  const labels = stats.map(s => s.mois);
+  const maintenances = stats.map(s => s.maintenances);
+  const couts = stats.map(s => s.cout_moyen);
+  const mttr = stats.map(s => s.mttr);
+  const mtbf = stats.map(s => s.mtbf);
+
+  const ctx = document.getElementById('maintenanceChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '🛠 Maintenances',
+          data: maintenances,
+          backgroundColor: '#80004D'
+        },
+        {
+          label: '💰 Coût moyen (€)',
+          data: couts,
+          backgroundColor: '#DAF7A6'
+        },
+        {
+          label: '⏱ MTBF (h)',
+          data: mtbf,
+          backgroundColor: '#FFC300'
+        },
+        {
+          label: '🧰 MTTR (h)',
+          data: mttr,
+          backgroundColor: '#FF5733'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Vue d’ensemble des maintenances'
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock %}
+

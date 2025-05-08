@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+    <h2><i class="fas fa-chart-line"></i> Tableau de Bord - Maintenance Préventive</h2>
+
+    <div class="kpi-container">
+        {% for s in stats %}
+        <div class="kpi-card">
+            <h4>{{ s.mois }}</h4>
+            <div class="kpi-data">
+                <span><strong>{{ s.maintenances }}</strong> maintenances</span>
+                <span><strong>{{ s.temps_total }}</strong> h</span>
+                <span><strong>{{ s.cout_moyen }}</strong> dhs</span>
+                <span><strong>{{ s.taux_conformite|floatformat:0 }}</strong> % conformité</span>
+                <span><strong>{{ s.mtbf }}</strong> MTBF</span>
+                <span><strong>{{ s.mttr }}</strong> MTTR</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chart-container">
+        <canvas id="maintenanceChart" height="100"></canvas>
+    </div>
+</div>
+
+<script>
+    const stats = JSON.parse('{{ stats|safe|escapejs }}');
+    const labels = stats.map(s => s.mois);
+    const maintenances = stats.map(s => s.maintenances);
+
+    const ctx = document.getElementById('maintenanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '🔧 Maintenances par mois',
+                data: maintenances,
+                backgroundColor: '#7c1e58',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

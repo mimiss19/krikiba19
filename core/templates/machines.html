@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2><i class="fas fa-sitemap"></i> Liste des Machines</h2>
+
+  <!-- FILTRES + BOUTON -->
+  <div class="filter-bar">
+    <form method="get" class="filter-group">
+      <input type="text" name="nom" placeholder="🔍 Rechercher par nom..." value="{{ request.GET.nom }}" class="filter-input">
+
+      <select name="statut" class="filter-select">
+        <option value="">⚙️ Tous les statuts</option>
+        <option value="operationnel" {% if request.GET.statut == "operationnel" %}selected{% endif %}>🟢 Opérationnel</option>
+        <option value="en_panne" {% if request.GET.statut == "en_panne" %}selected{% endif %}>🔴 En panne</option>
+      </select>
+
+      <select name="type" class="filter-select">
+        <option value="">🛠️ Tous les types</option>
+        <option value="tour" {% if request.GET.type == "tour" %}selected{% endif %}>Tour</option>
+        <option value="perceuse" {% if request.GET.type == "perceuse" %}selected{% endif %}>Perceuse</option>
+      </select>
+
+      <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filtrer</button>
+    </form>
+
+    <div class="add-machine">
+      <a href="{% url 'ajouter_machine' %}" class="btn-add">
+        <i class="fas fa-plus-circle"></i> Ajouter une machine
+      </a>
+    </div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="table-responsive mt-3">
+    <table class="table-gmao">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th><i class="fas fa-cogs"></i> Nom</th>
+          <th><i class="fas fa-tools"></i> Type</th>
+          <th><i class="fas fa-signal"></i> Statut</th>
+          <th><i class="fas fa-calendar-check"></i> Dernière</th>
+          <th><i class="fas fa-calendar-alt"></i> Prochaine</th>
+          <th><i class="fas fa-hourglass-half"></i> Jours Restants</th>
+          <th><i class="fas fa-bell"></i> Alerte</th>
+          <th><i class="fas fa-wrench"></i> Maintenance</th>
+          <th><i class="fas fa-ellipsis-v"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in machines %}
+        <tr>
+          <td>{{ m.id }}</td>
+          <td>{{ m.nom }}</td>
+          <td>{{ m.get_type_display }}</td>
+
+          <td>
+            {% if m.statut == "operationnel" %}
+              <span class="status-chip green">🟢 Opérationnel</span>
+            {% else %}
+              <span class="status-chip red">🔴 En panne</span>
+            {% endif %}
+          </td>
+
+          <td>{{ m.derniere_maintenance|default:"—" }}</td>
+          <td>{{ m.prochaine_maintenance|default:"—" }}</td>
+          <td>
+            {% if m.jours_restant < 0 %}
+              <span class="days-negative">{{ m.jours_restant }}</span>
+            {% else %}
+              {{ m.jours_restant }}
+            {% endif %}
+          </td>
+
+          <td>
+            {% if m.alerte_maintenance == "🔴 En retard" %}
+              <span class="badge badge-red">🔴 En retard</span>
+            {% elif m.alerte_maintenance == "🟡 Bientôt" %}
+              <span class="badge badge-yellow">🟡 Bientôt</span>
+            {% else %}
+              <span class="badge badge-green">🟢 OK</span>
+            {% endif %}
+          </td>
+
+          <td>
+            <a href="{% url 'voir_maintenance_machine' machine_id=m.id %}" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-file-alt"></i> Voir maintenances
+          </td>
+
+          <td class="actions-icons">
+            <a href="{% url 'modifier_machine' id=m.id %}"title="Modifier"><i class="fas fa-pen"></i></a>
+            <a href="{% url 'supprimer_machine' id=m.id %}"title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'details_machine' m.id %}" class="btn btn-outline-info btn-sm">🔍</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

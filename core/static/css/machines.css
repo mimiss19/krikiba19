@@ -1,0 +1,147 @@
+/* --- GLOBAL --- */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fb;
+    color: #333;
+}
+
+h2 {
+    margin-bottom: 25px;
+    font-weight: bold;
+    color: #4a0033;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.container {
+    padding: 40px;
+}
+
+/* --- FILTER BAR --- */
+.filter-bar {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-input,
+.filter-select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    min-width: 180px;
+}
+
+.btn-filter {
+    background: #6a0dad;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-filter:hover {
+    background: #4c0080;
+}
+
+.add-machine .btn-add {
+    background: #28a745;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.add-machine .btn-add:hover {
+    background: #218838;
+}
+
+/* --- TABLE --- */
+.table-gmao {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.table-gmao th, 
+.table-gmao td {
+    padding: 14px 18px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.table-gmao thead {
+    background: #6a0dad;
+    color: white;
+}
+
+.table-gmao tbody tr:hover {
+    background-color: #f3f3f3;
+}
+
+/* --- BADGES STATUT --- */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.badge-green {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-red {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-yellow {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+/* --- ACTION ICONS --- */
+.actions-icons a {
+    margin: 0 6px;
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.actions-icons a:hover {
+    transform: scale(1.2);
+}
+
+.actions-icons a:nth-child(1) {
+    color: #ffc107; /* edit */
+}
+
+.actions-icons a:nth-child(2) {
+    color: #dc3545; /* delete */
+}
+
+.actions-icons a:nth-child(3) {
+    color: #17a2b8; /* details */
+}

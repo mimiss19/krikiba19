@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>➕ Ajouter une machine</h2>
+    <form method="post" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col">
+                <label for="nom" class="form-label">Nom</label>
+                <input type="text" class="form-control" name="nom" required>
+            </div>
+            <div class="col">
+                <label for="type" class="form-label">Type</label>
+                <select name="type" class="form-select" required>
+                    <option value="tour">Tour</option>
+                    <option value="perceuse">Perceuse</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="statut" class="form-label">Statut</label>
+                <select name="statut" class="form-select" required>
+                    <option value="operationnel">🟢 Opérationnel</option>
+                    <option value="en_panne">🔴 En panne</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="derniere_maintenance" class="form-label">Dernière maintenance</label>
+                <input type="date" class="form-control" name="derniere_maintenance" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="frequence_jours" class="form-label">Fréquence (jours)</label>
+                <input type="number" class="form-control" name="frequence_jours" min="1" required>
+            </div>
+            <div class="col">
+                <label for="emplacement" class="form-label">Emplacement</label>
+                <input type="text" class="form-control" name="emplacement">
+            </div>
+        </div>
+
+        <div class="text-end">
+            <a href="{% url 'machines' %}" class="btn btn-secondary">Retour</a>
+            <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 p-10 rounded-b-3xl shadow-lg text-center text-white relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-10 left-10 w-20 h-20 rounded-full bg-white"></div>
+        <div class="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-white"></div>
+        <div class="absolute top-20 right-40 w-16 h-16 rounded-full bg-white"></div>
+    </div>
+    <div class="relative z-10">
+        <h1 class="text-4xl font-bold mb-2">Smart GMAO</h1>
+        <p class="text-md text-indigo-100">Plateforme intelligente de gestion de maintenance</p>
+    </div>
+</section>
+
+<!-- Navigation -->
+<div class="max-w-7xl mx-auto mt-6 px-4">
+    <div class="bg-white rounded-xl shadow p-2 flex space-x-2 overflow-x-auto">
+        <button 
+            onclick="setActiveTab('aperçu')"
+            id="tab-aperçu"
+            class="px-4 py-2 rounded-lg text-sm font-medium flex items-center bg-indigo-100 text-indigo-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Aperçu
+        </button>
+        <button 
+            onclick="setActiveTab('planification')"
+            id="tab-planification"
+            class="px-4 py-2 rounded-lg text-sm font-medium flex items-center text-gray-500 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Planning
+        </button>
+        <button 
+            onclick="setActiveTab('equipements')"
+            id="tab-equipements"
+            class="px-4 py-2 rounded-lg text-sm font-medium flex items-center text-gray-500 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Équipements
+        </button>
+        <button 
+            onclick="setActiveTab('performance')"
+            id="tab-performance"
+            class="px-4 py-2 rounded-lg text-sm font-medium flex items-center text-gray-500 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Performance
+        </button>
+    </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="max-w-7xl mx-auto p-4 mt-4">
+    <!-- Widgets KPI -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white shadow rounded-xl p-6 flex items-center hover:shadow-md transition">
+            <div class="rounded-full bg-indigo-100 p-3 mr-4">
+                <span class="text-indigo-600 text-xl">🔧</span>
+            </div>
+            <div>
+                <h2 class="text-gray-500 text-sm">Maintenances totales</h2>
+                <span class="text-2xl font-bold text-indigo-600">20</span>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-xl p-6 flex items-center hover:shadow-md transition">
+            <div class="rounded-full bg-green-100 p-3 mr-4">
+                <span class="text-green-600 text-xl">⏱️</span>
+            </div>
+            <div>
+                <h2 class="text-gray-500 text-sm">Temps total passé</h2>
+                <span class="text-2xl font-bold text-green-600">118h</span>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-xl p-6 flex items-center hover:shadow-md transition">
+            <div class="rounded-full bg-red-100 p-3 mr-4">
+                <span class="text-red-600 text-xl">⚠️</span>
+            </div>
+            <div>
+                <h2 class="text-gray-500 text-sm">MTTR (h)</h2>
+                <span class="text-2xl font-bold text-red-600">1.5</span>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-xl p-6 flex items-center hover:shadow-md transition">
+            <div class="rounded-full bg-purple-100 p-3 mr-4">
+                <span class="text-purple-600 text-xl">✅</span>
+            </div>
+            <div>
+                <h2 class="text-gray-500 text-sm">Disponibilité</h2>
+                <span class="text-2xl font-bold text-purple-600">95%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques et tableaux -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- État des équipements -->
+        <div class="bg-white shadow rounded-xl p-6 hover:shadow-md transition">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                <span class="mr-2 text-indigo-600 text-xl">📁</span> État des équipements
+            </h2>
+            <div class="h-64">
+                <canvas id="equipment-status-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Types de maintenance -->
+        <div class="bg-white shadow rounded-xl p-6 hover:shadow-md transition">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                <span class="mr-2 text-indigo-600 text-xl">🔧</span> Types de maintenance
+            </h2>
+            <div class="h-64">
+                <canvas id="maintenance-type-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tendances et planning -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- MTTR Trend -->
+        <div class="bg-white shadow rounded-xl p-6 hover:shadow-md transition">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                <span class="mr-2 text-indigo-600 text-xl">📊</span> Évolution MTTR (heures)
+            </h2>
+            <div class="h-64">
+                <canvas id="mttr-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- MTBF Trend -->
+        <div class="bg-white shadow rounded-xl p-6 hover:shadow-md transition">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                <span class="mr-2 text-indigo-600 text-xl">📊</span> Évolution MTBF (heures)
+            </h2>
+            <div class="h-64">
+                <canvas id="mtbf-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planning des interventions -->
+    <div class="bg-white shadow rounded-xl p-6 mb-6">
+        <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+            <span class="mr-2 text-indigo-600 text-xl">📅</span> Planning des interventions
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Machine</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date prévue</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Fraiseuse CNC</td>
+                        <td class="px-6 py-4">Maintenance préventive</td>
+                        <td class="px-6 py-4 whitespace-nowrap">30 Avril 2025</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-purple-600 bg-purple-100">📅 Planifiée</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Robot de soudure</td>
+                        <td class="px-6 py-4">Calibrage capteurs</td>
+                        <td class="px-6 py-4 whitespace-nowrap">2 Mai 2025</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-purple-600 bg-purple-100">📅 Planifiée</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Tour CNC</td>
+                        <td class="px-6 py-4">Recalibrage moteur</td>
+                        <td class="px-6 py-4 whitespace-nowrap">27 Avril 2025</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-blue-600 bg-blue-100">🔧 En cours</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Presse hydraulique</td>
+                        <td class="px-6 py-4">Remplacement joints</td>
+                        <td class="px-6 py-4 whitespace-nowrap">18 Avril 2025</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-green-600 bg-green-100">✅ Terminée</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Machine1</td>
+                        <td class="px-6 py-4">Recalibrage moteur</td>
+                        <td class="px-6 py-4 whitespace-nowrap">9 Avril 2025</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-green-600 bg-green-100">✅ Terminée</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Alertes et notifications -->
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+            <span class="mr-2 text-indigo-600 text-xl">⚠️</span> Alertes récentes
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Machine</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type d'alerte</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priorité</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Presse #2</td>
+                        <td class="px-6 py-4">Pression hydraulique basse</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-red-600 bg-red-100">⚠️ Haute</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">Convoyeur A3</td>
+                        <td class="px-6 py-4">Vibration anormale</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-orange-600 bg-orange-100">⚠ Moyenne</span></td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">CNC #5</td>
+                        <td class="px-6 py-4">Surchauffe moteur</td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-1 rounded-full text-red-600 bg-red-100">⚠️ Haute</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour les fonctionnalités -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    // Fonction pour changer d'onglet
+    function setActiveTab(tabId) {
+        // Reset all tabs
+        document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+            tab.classList.remove('bg-indigo-100', 'text-indigo-700');
+            tab.classList.add('text-gray-500', 'hover:bg-gray-100');
+        });
+        
+        // Activate selected tab
+        const selectedTab = document.getElementById(`tab-${tabId}`);
+        if (selectedTab) {
+            selectedTab.classList.remove('text-gray-500', 'hover:bg-gray-100');
+            selectedTab.classList.add('bg-indigo-100', 'text-indigo-700');
+        }
+    }
+
+    // Initialisation des graphiques après le chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Données pour les graphiques
+        const equipmentStatusData = {
+            labels: ['En fonctionnement', 'En maintenance', 'En panne', 'En attente'],
+            datasets: [{
+                data: [42, 7, 3, 5],
+                backgroundColor: ['#10B981', '#3B82F6', '#EF4444', '#F59E0B'],
+                borderColor: ['#10B981', '#3B82F6', '#EF4444', '#F59E0B'],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        };
+
+        const maintenanceTypeData = {
+            labels: ['Préventive', 'Corrective'],
+            datasets: [{
+                label: 'Nombre d\'interventions',
+                data: [12, 8],
+                backgroundColor: ['#8B5CF6', '#EC4899'],
+                borderColor: ['#8B5CF6', '#EC4899'],
+                borderWidth: 1
+            }]
+        };
+
+        // MODIFIÉ: Données sur 3 semaines au lieu de 5 mois
+        const mttrData = {
+            labels: ['Semaine 1', 'Semaine 2', 'Semaine 3'],
+            datasets: [{
+                label: 'MTTR (heures)',
+                data: [2.1, 1.8, 1.5],
+                fill: false,
+                borderColor: '#EF4444',
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointBackgroundColor: '#EF4444'
+            }]
+        };
+
+        // MODIFIÉ: Données sur 3 semaines au lieu de 5 mois
+        const mtbfData = {
+            labels: ['Semaine 1', 'Semaine 2', 'Semaine 3'],
+            datasets: [{
+                label: 'MTBF (heures)',
+                data: [280, 320, 350],
+                fill: false,
+                borderColor: '#10B981',
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointBackgroundColor: '#10B981'
+            }]
+        };
+
+        // Options communes pour les graphiques
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false
+        };
+
+        // Assurez-vous que les éléments canvas existent avant de créer les graphiques
+        const equipmentCtx = document.getElementById('equipment-status-chart');
+        if (equipmentCtx) {
+            new Chart(equipmentCtx, {
+                type: 'doughnut',
+                data: equipmentStatusData,
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        const maintenanceCtx = document.getElementById('maintenance-type-chart');
+        if (maintenanceCtx) {
+            new Chart(maintenanceCtx, {
+                type: 'bar',
+                data: maintenanceTypeData,
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const mttrCtx = document.getElementById('mttr-chart');
+        if (mttrCtx) {
+            new Chart(mttrCtx, {
+                type: 'line',
+                data: mttrData,
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        tooltip: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const mtbfCtx = document.getElementById('mtbf-chart');
+        if (mtbfCtx) {
+            new Chart(mtbfCtx, {
+                type: 'line',
+                data: mtbfData,
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        tooltip: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
